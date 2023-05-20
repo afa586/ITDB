@@ -1,0 +1,135 @@
+{% extends "itasset/layout.html" %}
+
+{% block title %}
+    <title>Custom Report</title>
+{% endblock %}
+
+<!-- script block -->
+{% block scripts %}
+<script>
+	function binSelectFilter(){
+		$('.filters').change(function(){
+			$('#filterform').submit();
+		})
+	}
+
+	// Function for record click
+	function trclick(a){
+		// document.location = a.getAttribute('uid');
+		window.open(a.getAttribute('uid'));
+	}
+	
+	$(function(){
+		binSelectFilter();		
+		$('#maintable').DataTable( {
+			dom: '<"row"<"col-3"B><"col-6 text-center"i><"col-3"f>>rt<"row"<"col-6"l><"col-6"p>>',
+    		paging: false,
+			// scrollY: 400,
+			stateSave: true,			
+			select: {
+				style: 'single'
+			},	
+			'buttons': [
+						{  
+                        extend: 'excelHtml5',  
+                        text: 'Export',
+						className:'btn btn-light',                                                  
+                       	},
+						{  
+                        extend: 'colvis',  
+                        text: 'Columns',
+						className:'btn btn-light',                                                  
+                       	},
+
+			]
+		} );		
+	})
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+{% block mainbody %}
+
+
+<!-- Asset table -->
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<nav style="--bs-breadcrumb-divider: '-';" aria-label="breadcrumb">
+				<ol class="breadcrumb">						
+					<li class="breadcrumb-item active">Custom Report</li>
+				</ol>
+			</nav>
+		</div>		
+		<!-- Filter Area -->
+		<form method="get" id="filterform">	
+			<div class="row">							
+				{% for field in form %}
+				<div class="col">
+					{{ field }} 
+				</div>					
+				{% endfor %}
+				<!-- <div class="col-1"><a href="add" class="btn btn-primary">Add</a></div>				 -->
+			</div>
+		</form>	
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">	
+				<thead class="table-light">
+					<tr>
+						<th>Asset_Name</th>
+						<th>Tanium_Lastsee</th>
+						<th>Company</th>
+						<th>Category</th>
+						<th>Model</th>
+						<th>SN</th>	
+						<th>User_Name</th>
+						<th>User_Account</th>
+						<th>Asset_Status</th>		
+						<th>Price</th>				
+						<th>Initial_OS</th>
+						<th>OS</th>
+						<th>Office</th>
+						<th>CPU</th>
+						<th>memory</th>
+						<th>HDD</th>
+						<th>Purchase_Date</th>							
+						<th>Vendor</th>
+						<th>Comment</th>				
+					</tr>
+				</thead>	
+			
+				<tbody id="assetbody">	
+					{% for i in asset_list %}
+					<tr uid="/itasset/asset/detail?pk={{i.id}}" ondblclick="trclick(this)">
+						<td>{{ i.name }}</td>
+						<td>{{ i.tanium_lastsee }}</td>
+						<td>{{ i.company }}</td>
+						<td>{{ i.category }}</td>
+						<td>{{ i.model }}</td>
+						<td>{{ i.sn }}</td>
+						<td>{{ i.user.name }}</td>
+						<td>{{ i.user.account }}</td>
+						<td>{{ i.status }}</td>
+						<td>{{ i.price }}</td>
+						<td>{{ i.initial_os }}</td>				
+						<td>{{ i.os }}</td>
+						<td>{{ i.office }}</td>
+						<td>{{ i.cpu}}</td>
+						<td>{{ i.memory }}</td>
+						<td>{{ i.hdd }}</td>
+						<td>{{ i.purchase_date|safe }}</td>								
+						<td>{{ i.vendor }}</td>
+						<td>{{ i.description }}</td>							
+					</tr>
+									
+				{% endfor %}
+
+				</tbody>	
+			</table>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends "itdc/layout.html" %}
+{% load static %}  
+{% block title %}
+    <title>Home</title>
+    {% endblock %}
+{% block scripts %}
+<script src="{% static 'echarts/echarts.min.js' %}"></script>
+<script>	
+	var option;
+	var option_tree;
+	
+	option = {
+	title: {
+		text: '',
+		left: 'center'
+	},
+	tooltip: {
+		trigger: 'item'
+	},
+	legend: {
+		orient: 'vertical',
+		left: 'left'
+	},
+	series: [
+		{
+		name: 'Access From',
+		type: 'pie',
+		radius: '50%',
+		data: [	],
+		emphasis: {
+			itemStyle: {
+			shadowBlur: 10,
+			shadowOffsetX: 0,
+			shadowColor: 'rgba(0, 0, 0, 0.5)'
+			}
+		}
+		}
+	]
+	};
+
+	option_tree = {
+		tooltip: {
+		trigger: 'item',
+		triggerOn: 'mousemove'
+		},
+		series: [
+			{
+			type: 'tree',
+			id: 0,
+			name: 'tree1',
+			data: [],
+			top: '1%',
+			left: '10%',
+			bottom: '1%',
+			right: '15%',
+			symbolSize: 7,
+			edgeShape: 'polyline',
+			edgeForkPosition: '63%',
+			initialTreeDepth: 3,
+			lineStyle: {
+				width: 2
+			},
+			label: {
+				backgroundColor: '#fff',
+				position: 'left',
+				verticalAlign: 'middle',
+				align: 'right'
+			},
+			leaves: {
+				label: {
+				position: 'right',
+				verticalAlign: 'middle',
+				align: 'left'
+				}
+			},
+			emphasis: {
+				focus: 'descendant'
+			},
+			expandAndCollapse: true,
+			animationDuration: 550,
+			animationDurationUpdate: 750
+			}
+		]
+		};
+	$.ajax({
+		url: '/itdc?data=all',
+			type: 'get',
+			data: {},
+			dataType: 'JSON',
+			success: function(res){
+				console.log(res.data);
+				// Create chart for category summary
+				var chartDom = document.getElementById('category_summary');
+				var myChart = echarts.init(chartDom);
+				option['series'][0]['data'] = res.data[0];
+				option && myChart.setOption(option);
+				// Create chart for os summary
+				var chartDom = document.getElementById('os_summary');
+				var myChart = echarts.init(chartDom);
+				option['series'][0]['data'] = res.data[1];
+				option && myChart.setOption(option);
+				// Create chart for location summary
+				var chartDom = document.getElementById('location_summary');
+				var myChart = echarts.init(chartDom);
+				option['series'][0]['data'] = res.data[2];
+				option && myChart.setOption(option);
+				// Create chart for software license summary
+				var chartDom = document.getElementById('software_summary');
+				var myChart = echarts.init(chartDom);
+				option['series'][0]['data'] = res.data[3];
+				option && myChart.setOption(option);
+				// Create chart for tree summary
+				var chartDom = document.getElementById('tree_summary');
+				var myChart = echarts.init(chartDom);
+				option_tree['series'][0]['data'] = [res.data[4]];
+				console.log(option_tree['series'][0]['data']);
+				option_tree && myChart.setOption(option_tree);
+
+			}
+	})
+
+	
+</script>
+{% endblock %}
+<!-- main body block -->
+
+
+{% block mainbody %}
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<nav style="--bs-breadcrumb-divider: '-';" aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item active">Home</li>						
+				</ol>
+			</nav>
+		</div>			
+	</div>
+	<div class="card-body">		
+		<div class="row">
+			<div class="col-6">
+				<div class="card" style="height:400px;">
+					<div class="card-header text-center">Tree Summary</div>
+					<div class="card-body" id="tree_summary"></div>
+				</div>
+				<p></p>
+			</div>
+
+			<div class="col-6">		
+				<div class="card" style="height:400px;">
+					<div class="card-header text-center">Category Summary</div>
+					<div class="card-body" id="category_summary"></div>
+				</div>
+				<p></p>
+			</div>
+			<div class="col-6">	
+				<div class="card" style="height:400px;">
+					<div class="card-header text-center">OS Summary</div>
+					<div class="card-body" id="os_summary"></div>
+				</div>
+				<p></p>
+			</div>
+			
+			<div class="col-6">
+				<div class="card" style="height:400px;">
+					<div class="card-header text-center">Location Summary</div>
+					<div class="card-body" id="location_summary"></div>
+				</div>
+				<p></p>
+			</div>
+			<div class="col-6">
+				<div class="card" style="height:400px;">
+					<div class="card-header text-center">Software license Summary</div>
+					<div class="card-body" id="software_summary"></div>
+				</div>
+				<p></p>
+			</div>
+
+		</div>
+	</div>	
+	<div class="card-footer text-muted">
+	</div>
+</div>
+
+
+{% endblock %}

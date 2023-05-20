@@ -1,0 +1,116 @@
+{% extends "itasset/layout.html" %}
+
+{% block title %}
+<title>Users</title>
+{% endblock %} 
+
+<!-- script block -->
+{% block scripts %}
+<script>
+	function binSelectFilter(){
+		$('.filters').change(function(){
+			$('#filterform').submit();
+		})
+	}
+
+	// Function for record click
+	function trclick(a){
+		document.location = a.getAttribute('uid');
+		// window.open(a.getAttribute('uid'));
+	}
+	
+	$(function(){
+		binSelectFilter();		
+		$('#maintable').DataTable( {
+			dom: '<"row"<"col-3"B><"col-6 text-center"i><"col-3"f>>rt<"row"<"col-6"l><"col-6"p>>',
+    		paging: true,
+			// scrollY: 400,
+			// stateSave: true,
+			select: {
+				style: 'single'
+			},			
+			'buttons': [
+						{  
+                        extend: 'excelHtml5',  
+                        text: 'Export',
+						className:'btn btn-light',                                                  
+                       	},
+						{  
+                        extend: 'colvis',  
+                        text: 'Columns',
+						className:'btn btn-light',                                                  
+                       	},
+
+			]
+		} );	
+		$('tr[data-href]').on("dblclick", function() {
+			document.location = $(this).data('href');
+			// window.open($(this).data('href'));
+		});		
+	})
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+{% block mainbody %}
+
+
+<!-- Asset table -->
+<div class="card">
+	<div class="card-header">	
+		<div class="row">
+			<div class="col">
+				<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item active">User list</li>
+					</ol>
+				</nav>
+			</div>	
+			<!-- <div class="col-1"><a href="add" class="btn btn-primary btn-sm">Add</a></div>	 -->
+		</div>	
+		<!-- Filter Area -->
+		<form method="get" id="filterform">	
+			<div class="row">							
+				{% for field in form %}
+				<div class="col">
+					{{ field }} 
+				</div>					
+				{% endfor %}
+				<!-- <div class="col-1"><a href="add" class="btn btn-primary">Add</a></div>				 -->
+			</div>
+		</form>	
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">
+				<thead class="table-light">
+					<tr>
+						<th>Name</th>
+						<th>Company</th>
+						<th>Account</th>		
+						<th>Department</th>						
+						<th>Location</th>
+						<th>Is_Active</th>
+						<th>Comment</th>				
+					</tr>
+				</thead>
+				<tbody>
+			{% for i in user_list %}
+					<tr uid="/itasset/user/detail?pk={{i.id}}" ondblclick="trclick(this)">
+						<td>{{ i.name }}</td>						
+						<td>{{ i.company }}</td>
+						<td>{{ i.account }}</td>
+						<td>{{ i.department }}</td>
+						<td>{{ i.location }}</td>
+						<td>{{ i.is_active }}</td>
+						<td>{{ i.comment|default:'-' }}</td>			
+					</tr>					
+				{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+{% endblock %}

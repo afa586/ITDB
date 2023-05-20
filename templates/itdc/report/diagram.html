@@ -1,0 +1,34 @@
+{% extends "itdc/layout.html" %}
+{% load static %}
+{% block title %}
+<title>
+Server Structure for {{location}}
+</title>
+{% endblock %} 
+
+<!-- Script block -->
+{% block scripts %}
+	
+{% endblock %}
+
+<!-- Main body block -->
+{% block mainbody %}
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/itdc">Home</a></li>					
+					<li class="breadcrumb-item active">Server structure for {{location|upper}}</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="row text-center" id="chartscontainer">
+			<a href="{% static 'imgs/' %}{{location}}_server_diagram.png"><img src="{% static 'imgs/' %}{{location}}_server_diagram.png" style="height:600px ;"></a>	
+		</div>
+	</div>
+</div>
+
+{% endblock %}

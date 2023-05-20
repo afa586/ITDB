@@ -1,0 +1,168 @@
+{% extends "itdc/layout.html" %}
+{% block title %}
+    <title>Search</title>
+{% endblock %}
+<!-- script block -->
+{% block scripts %}
+<script>
+	// Function for record click
+	function trclick(a){
+		document.location = a.getAttribute('uid');
+		// window.open(a.getAttribute('uid'));
+	}
+
+	$(function(){
+		$('#maintable').DataTable( {
+    		paging: false,
+			stateSave: true,
+			select: {
+				style: 'single'
+			},
+			// scrollY: 400,	
+
+		} );
+		$('#softwaretable').DataTable( {
+    		paging: false,
+			stateSave: true,
+			// scrollY: 400,
+			select: {
+				style: 'single'
+			},	
+
+		} );
+	} );
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+
+
+{% block mainbody %}
+{% if asset_list %}
+<div class="card">
+	<div class="card-header">		
+		<div class="row">
+			<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/itdc">Home</a></li>					
+					<li class="breadcrumb-item active">Search</li>
+					<li class="breadcrumb-item active">Assets</li>
+				</ol>
+			</nav>
+		</div>
+	</div>		
+
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">
+				<thead class="table-light">
+					<tr>
+						<th>Name</th>
+						<th>Category</th>
+						<th>Location</th>
+						<th>Model</th>
+						<th>SN</th>
+						<th>Container</th>	
+						<th>OS</th>
+						<th>Software_key</th>
+						<th>CPU</th>
+						<th>Memory</th>		
+						<th>HDD</th>				
+						<th>IS_Active</th>
+						<th>Is_PowerOn</th>
+						<th>Is_Container</th>						
+						<th>Purchase_Date</th>
+						<th>Expire_Date</th>
+						<th>Price</th>
+						<th>Vendor</th>													
+						<th>Comment</th>	
+					</tr>
+				</thead>
+				<tbody>
+				{% for obj in asset_list %}
+					<tr uid="asset/detail?pk={{obj.id}}" ondblclick="trclick(this)">
+						<td>{{obj.name}}</td>
+						<td>{{obj.category}}</td>
+						<td>{{obj.location}}</td>
+						<td>{{obj.model|default:'-'}}</td>
+						<td>{{obj.sn|default:'-'}}</td>
+						<td>{{obj.container|default:'-'}}</td>
+						<td>{{obj.os|default:'-'}}</td>
+						<td>
+							{% for i in obj.software_set.all %}
+							<a href="/itdc/software/detail?pk={{i.id}}">{{i}}</a>
+							{% endfor %}
+						</td>
+						<td>{{obj.cpu|default:'-'}}</td>
+						<td>{{obj.memory|default:'-'}}</td>
+						<td>{{obj.hdd|default:'-'}}</td>
+						<td>{{obj.is_active}}</td>
+						<td>{{obj.is_poweron}}</td>
+						<td>{{obj.is_container}}</td>
+						<td>{{obj.purchase_date|default:'-'|date:"Y-m-d"}}</td>
+						<td>{{obj.expire_date|default:'-'|date:"Y-m-d"}}</td>
+						<td>{{obj.price|default:'-'}}</td>
+						<td>{{obj.vendor|default:'-'}}</td>
+						<td>{{obj.comment|default:'-'}}</td>
+					</tr>					
+				{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+{% endif %}
+<p></p>
+{% if software_list %}
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<div class="col">
+				<nav style="--bs-breadcrumb-divider: '-';" aria-label="breadcrumb">
+					<ol class="breadcrumb">					
+						<li class="breadcrumb-item active">Search</li>
+						<li class="breadcrumb-item active">Software</li>
+					</ol>
+				</nav>
+			</div>
+			<div class="col-1"><a href="/itdc/software/add" class="btn btn-light">Add</a></div>
+		</div>		
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="softwaretable">
+				<thead class="table-light">
+					<tr>
+						<th>Name</th>
+						<th>Software_Key</th>
+						<th>Quantity</th>
+						<th>Used_Count</th>						
+						<th>Hosts</th>						
+						<th>Comment</th>	
+					</tr>
+				</thead>
+				<tbody>
+				{% for obj in software_list %}
+					<tr uid="software/detail?pk={{obj.id}}" ondblclick="trclick(this)">
+						<td>{{obj.name}}</td>
+						<td>{{obj.softwarekey}}</td>
+						<td>{{obj.quantity}}</td>
+						<td>{{obj.used_count}}</td>
+						<td>
+							{% for i in obj.asset.all %}
+							{{i}}</br>
+							{% endfor %}
+						</td>
+						<td>{{obj.comment}}</td>						
+					</tr>					
+				{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+{% endif %}
+{% endblock %}

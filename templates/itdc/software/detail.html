@@ -1,0 +1,178 @@
+{% extends "itdc/layout.html" %}
+{% block mainbody %}
+{% block title %}
+    <title>Software Details</title>
+{% endblock %}
+	<div class="row justify-content-md-center">				
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col">
+							<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+								<ol class="breadcrumb">
+									<li class="breadcrumb-item"><a href="/itdc/software/list">Software List</a></li>
+									<li class="breadcrumb-item active">Software detail</li>
+								</ol>
+							</nav>
+						</div>
+						<div class="col-6">
+							<a href="add" class="btn btn-primary btn-sm">Add</a>
+							<a href="edit?pk={{software.id}}" class="btn btn-primary btn-sm">Edit</a>
+							<a href="clone?pk={{software.id}}" class="btn btn-primary btn-sm">Clone</a>
+							<a href="delete?pk={{software.id}}" class="btn btn-primary btn-sm">Delete</a>
+						</div>	
+					</div>	
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-6">Software Name:</div><div class="col-6">{{software.name}}</div>
+						<div class="col-6">Software Key:</div><div class="col-6">{{software.softwarekey}}</div>
+						<div class="col-6">Quantity:</div><div class="col-6">{{software.quantity}}</div>
+						<div class="col-6">Used Count:</div><div class="col-6">{{software.used_count}}</div>
+						<div class="col-6">Comment:</div><div class="col-6">{{software.comment}}</div>						
+					</div>
+				</div>
+			</div>			
+		</div>	
+		<p></p>
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col">Asset(s) use the key</div>
+						<div class="col-1">
+							<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal">
+								Add
+							</button>
+						</div>
+					</div>	
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="table-resonsive">
+							<table class="table table-hover table-sm" >	
+								<thead>
+									<tr>
+										<th></th>	
+										<th>Name</th>						
+										<th>category</th>
+										<th>OS</th>		
+										<th>Location</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for i in software.asset.all %}
+									<tr>
+										<td>
+											<button class="btn btn-sm btn-lignt" uid="?pk={{software.id}}&assetid={{i.id}}" onclick="UnAssign(this)">Unassign</button>
+										</td>
+										<td><a href="/itdc/asset/detail?pk={{i.id}}" target="_blank">{{ i.name }}</a></td>
+										<td>{{ i.category }}</td>
+										<td>{{ i.os }}</td>
+										<td>{{ i.location }}</td>							
+									</tr>					
+									{% endfor %}
+								</tbody>
+							</table>			
+						</div>
+					</div>
+				</div>
+			</div>			
+		</div>				
+	</div>	
+
+	<!-- Modal for software assign -->
+	<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLabel">Software Assign</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="card">
+					<p></p>
+					<div class="table-responsive">
+						<table class="table table-hover table-sm" id="assettable">
+							<thead class="table-light">
+								<tr>
+									<th>Name</th>
+									<th>Category</th>
+									<th>OS</th>
+									<th>Location</th>						
+									<th>Comment</th>	
+								</tr>
+							</thead>
+							<tbody>
+								{% for i in available_assets %}
+								<tr uid="?pk={{software.id}}&assetid={{i.id}}">
+									<td>{{ i.name }}</td>
+									<td>{{ i.category }}</td>
+									<td>{{ i.os }}</td>
+									<td>{{ i.location }}</td>							
+									<td>{{ i.comment }}</td>							
+								</tr>					
+								{% endfor %}
+							</tbody>
+			
+						</table>
+					</div>					
+				</div>
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+		</div>
+	</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+	// Function to assign software
+	function Assign(a){
+		$.ajax({
+			url: '/itdc/software/assign' + a.getAttribute('uid'),
+			type: 'get',
+			data: {},
+			dataType: 'JSON',
+			success: function(res){
+				if (res.status){
+					window.location.reload();
+				} else {
+					alert(res.msg);
+				}				
+			}
+		})
+	}
+	// Function to unassign software
+	function UnAssign(a){
+		$.ajax({
+			url: '/itdc/software/unassign' + a.getAttribute('uid'),
+			type: 'get',
+			data: {},
+			dataType: 'JSON',
+			success: function(res){
+				if (res.status){
+					window.location.reload();
+				} else {
+					alert(res.msg);
+				}				
+			}
+		})
+	}
+
+
+	$(function(){
+		$('#assettable').DataTable( {
+			paging: false,
+			scrollY: 200,
+		} );
+		$('#assettable tbody tr').on("click", function() {
+			Assign(this);
+		});		
+	})
+</script>
+{% endblock %}

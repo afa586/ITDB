@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}
+    <title>IT Documents</title>
+    {% endblock %}   
+    {% load static %}   
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'DataTables/datatables.min.css' %}">    
+    <!-- <script>
+      var commonUtil = {
+          /**
+           * 弹出消息框
+           * @param msg 消息内容
+           * @param type 消息框类型（参考bootstrap的alert）
+           */
+          alert: function(msg, type){
+              if(typeof(type) =="undefined") { // 未传入type则默认为success类型的消息框
+                  type = "success";
+              }
+              // 创建bootstrap的alert元素
+              var divElement = $("<div></div>").addClass('alert').addClass('alert-'+type).addClass('alert-dismissible').addClass('col-md-6');
+              divElement.css({ // 消息框的定位样式
+                  "position": "absolute",
+                  "top": "80px" 
+              });
+              divElement.text(msg); // 设置消息框的内容
+              // 消息框添加可以关闭按钮
+              // var closeBtn = $('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+              // $(divElement).append(closeBtn);
+              // 消息框放入到页面中
+              $('#liveAlertPlaceholder').append(divElement);
+              return divElement;
+          },
+          
+          /**
+           * 短暂显示后上浮消失的消息框
+           * @param msg 消息内容
+           * @param type 消息框类型
+           */
+          message: function(msg, type) {
+              var divElement = commonUtil.alert(msg, type); // 生成Alert消息框
+              var isIn = false; // 鼠标是否在消息框中
+              
+              divElement.on({ // 在setTimeout执行之前先判定鼠标是否在消息框中
+                mouseover : function(){isIn = true;},
+                mouseout  : function(){isIn = false;}
+              });
+      
+              // 短暂延时后上浮消失
+              setTimeout(function() {
+                  var IntervalMS = 20; // 每次上浮的间隔毫秒
+                  var floatSpace = 60; // 上浮的空间(px)
+                  var nowTop = divElement.offset().top; // 获取元素当前的top值
+                  var stopTop = nowTop - floatSpace;    // 上浮停止时的top值
+                  divElement.fadeOut(IntervalMS * floatSpace); // 设置元素淡出
+                  
+                  var upFloat = setInterval(function(){ // 开始上浮
+                      if (nowTop >= stopTop) { // 判断当前消息框top是否还在可上升的范围内
+                          divElement.css({"top": nowTop--}); // 消息框的top上升1px
+                      } else {
+                          clearInterval(upFloat); // 关闭上浮
+                          divElement.remove();    // 移除元素
+                      }
+                  }, IntervalMS);
+      
+                  if (isIn) { // 如果鼠标在setTimeout之前已经放在的消息框中，则停止上浮
+                      clearInterval(upFloat);
+                      divElement.stop();
+                  }
+                  
+                  divElement.hover(function() { // 鼠标悬浮时停止上浮和淡出效果，过后恢复
+                      clearInterval(upFloat);
+                      divElement.stop();
+                  },function() {
+                      divElement.fadeOut(IntervalMS * (nowTop - stopTop)); // 这里设置元素淡出的时间应该为：间隔毫秒*剩余可以上浮空间
+                      upFloat = setInterval(function(){ // 继续上浮
+                          if (nowTop >= stopTop) {
+                              divElement.css({"top": nowTop--});
+                          } else {
+                              clearInterval(upFloat); // 关闭上浮
+                              divElement.remove();    // 移除元素
+                          }
+                      }, IntervalMS);
+                  });
+              }, 1500);
+          }
+      }
+    </script> -->
+</head>
+<body>
+
+  <!-- <nav class="navbar bg-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/"><img src="/static/Logo.png"></a>  
+      <div class="col-md-3">      
+        <form class="d-flex" role="search" action="/document/search" method="get">
+          <input class="form-control me-2" type="search" placeholder="file/folder" aria-label="Search" name="keywords" required value="{{ keywords }}">
+        </form>
+      </div>   
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class="list-group-item">
+              <a class="nav-link" aria-current="page" href="/document">Home</a>
+            </li>                                                                         
+            <li class="list-group-item">
+            <a class="nav-link" href="/document/documentFilter">Document filter</a>
+            </li>                  
+            <li class="list-group-item">
+            <a class="nav-link" href="/document/customsearch">Custom Search</a>
+            </li>                 
+            <li class="list-group-item" class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Reports
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/document/report?reportname=document_duplicate">Duplicate document name</a></li>                              
+                <li><a class="dropdown-item" href="/document/report?reportname=folder_summary">Folder Summary</a></li>                
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <span class="nav-link"> User: {{ request.user }}</span>
+            </li>                
+          </ul>          
+          
+        </div>        
+      </div>
+    </div>
+  </nav> -->
+
+  <nav class="navbar navbar-expand-lg bg-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/"><img src="/static/Logo.png"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/document">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/document/documentFilter">Document filter</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/document/customsearch">Custom Search</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Reports
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/document/report?reportname=document_duplicate">Duplicate document name</a></li>                              
+                <li><a class="dropdown-item" href="/document/report?reportname=folder_summary">Folder Summary</a></li>     
+            </ul>
+          </li>        
+        </ul>
+        <form class="d-flex" role="search" action="/document/search" method="get">
+          <input class="form-control me-2" type="search" placeholder="file/folder" aria-label="Search" name="keywords" required value="{{ keywords }}">
+        </form>
+        
+        <div class="col-3"></div>
+      </div>
+    </div>
+  </nav>
+  <div class="row" style="height: 80px;"></div>
+  <div class="container">
+        {% block mainbody %}
+        {% endblock %}
+  </div>
+  <script src="{% static 'jQuery/jquery-3.6.1.min.js' %}"></script>
+  <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'DataTables/datatables.min.js' %}"></script>
+{% block scripts %}
+{% endblock %}
+<!-- Toast for copy -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+	<div id="copy_toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+	  <div class="toast-header">
+		<strong class="me-auto">Path Copied</strong>
+		<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+	  </div>
+	  <div class="toast-body" id="copy_body">
+		Hello, world! This is a toast message.
+	  </div>
+	</div>
+  </div>
+</body>
+</html>

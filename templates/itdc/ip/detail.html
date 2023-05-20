@@ -1,0 +1,142 @@
+{% extends "itdc/layout.html" %}
+{% block mainbody %}
+{% block title %}
+    <title>IP details</title>
+{% endblock %}
+	<div class="row justify-content-md-center">				
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col">
+							<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+								<ol class="breadcrumb">
+									<li class="breadcrumb-item"><a href="/itdc/ip/list">IP List</a></li>
+									<li class="breadcrumb-item active">IP detail</li>
+								</ol>
+							</nav>
+						</div>
+						<div class="col-6">
+							<a href="edit?pk={{ip.id}}" class="btn btn-primary btn-sm">Edit</a>
+							<a href="delete?pk={{ip.id}}" class="btn btn-primary btn-sm">Delete</a>
+						</div>	
+					</div>	
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-6">IP Address:</div><div class="col-6">{{ip.address}}</div>
+						<div class="col-6">Location:</div><div class="col-6">{{ip.location}}</div>
+						<div class="col-6">Comment:</div><div class="col-6">{{ip.comment}}</div>									
+						<div class="col-6">Asset:</div>
+						{% if ip.asset %}	
+							<div class="col-6">
+								<a href="/itdc/{{ip.asset.category}}/detail?pk={{ip.asset.id}}">{{ip.asset}}</a>		
+								<button class="btn btn-sm btn-lignt" uid="?pk={{ip.id}}" onclick="UnAssign(this)">UnAssign</button>	
+							</div>	
+						{% else %}	
+							<div class="col-6">
+								<button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#myModal">Assign</button>
+							</div>
+						{% endif %}																						
+					</div>
+				</div>
+			</div>			
+		</div>				
+	</div>	
+
+	<!-- Modal for IP assign -->
+	<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLabel">IP Assign</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="card">
+					<p></p>
+					<div class="table-responsive">
+						<table class="table table-hover table-sm" id="assettable">
+							<thead class="table-light">
+								<tr>
+									<th>Name</th>
+									<th>Category</th>
+									<th>OS</th>
+									<th>Location</th>						
+									<th>Comment</th>	
+								</tr>
+							</thead>
+							<tbody>
+								{% for i in available_assets %}
+								<tr uid="?pk={{ip.id}}&assetid={{i.id}}">
+									<td>{{ i.name }}</td>
+									<td>{{ i.category }}</td>
+									<td>{{ i.os }}</td>
+									<td>{{ i.location }}</td>							
+									<td>{{ i.comment }}</td>							
+								</tr>					
+								{% endfor %}
+							</tbody>
+			
+						</table>
+					</div>					
+				</div>
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+		</div>
+	</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+	// Function to assign ip
+	function Assign(a){
+		$.ajax({
+			url: '/itdc/ip/assign' + a.getAttribute('uid'),
+			type: 'get',
+			data: {},
+			dataType: 'JSON',
+			success: function(res){
+				if (res.status){
+					window.location.reload();
+				} else {
+					alert(res.msg);
+				}				
+			}
+		})
+	}
+	// Function to unassign ip
+	function UnAssign(a){
+		$.ajax({
+			url: '/itdc/ip/unassign' + a.getAttribute('uid'),
+			type: 'get',
+			data: {},
+			dataType: 'JSON',
+			success: function(res){
+				if (res.status){
+					window.location.reload();
+				} else {
+					alert(res.msg);
+				}
+				
+								
+			}
+		})
+	}
+
+
+	$(function(){
+		$('#assettable').DataTable( {
+			paging: false,
+			scrollY: 200,
+		} );
+		$('#assettable tbody tr').on("click", function() {
+			Assign(this);
+		});			
+	})
+</script>
+{% endblock %}

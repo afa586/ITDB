@@ -1,0 +1,87 @@
+{% extends "itasset/layout.html" %}
+
+{% block title %}
+    <title>Tanium Report</title>
+{% endblock %}
+
+<!-- script block -->
+{% block scripts %}
+<script>
+	$(function(){	
+		$('#maintable').DataTable( {
+			dom: '<"row"<"col-3"B><"col-6 text-center"i><"col-3"f>>rt<"row"<"col-6"l><"col-6"p>>',
+    		paging: false,
+			// scrollY: 400,
+			stateSave: true,			
+			select: {
+				style: 'single'
+			},	
+			'buttons': [
+						{  
+                        extend: 'excelHtml5',  
+                        text: 'Export',
+						className:'btn btn-light',                                                  
+                       	},
+						{  
+                        extend: 'colvis',  
+                        text: 'Columns',
+						className:'btn btn-light',                                                  
+                       	},
+
+			]
+		} );		
+	})
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+{% block mainbody %}
+
+
+<!-- Taniujm table -->
+<div class="card">
+	<div class="card-header">		
+		<div class="row">
+			<nav style="--bs-breadcrumb-divider: '-';" aria-label="breadcrumb">
+				<ol class="breadcrumb">						
+					<li class="breadcrumb-item active">Tanium List</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">	
+				<thead class="table-light">
+					<tr>			
+						<th>Name</th>
+						<th>User Name</th>
+						<th>Last See</th>
+						<th>OS</th>
+						<th>OS_Install_Date</th>
+						<th>Model</th>
+						<th>Last Reboot</th>						
+					</tr>
+				</thead>	
+			
+				<tbody id="assetbody">	
+					{% for i in tanium_list %}
+					<tr>
+						<td>{{ i.name }}</td>
+						<td>{{ i.username }}</td>
+						<td>{{ i.lastsee }}</td>
+						<td>{{ i.os }}</td>
+						<td>{{ i.os_install_date }}</td>
+						<td>{{ i.model }}</td>
+						<td>{{ i.last_reboot }}</td>						
+					</tr>
+									
+				{% endfor %}
+
+				</tbody>	
+			</table>
+		</div>
+	</div>
+</div>
+{% endblock %}

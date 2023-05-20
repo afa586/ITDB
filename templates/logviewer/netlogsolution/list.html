@@ -1,0 +1,209 @@
+{% extends "logviewer/layout.html" %}
+
+{% block title %}
+<title>Windows Event Solution</title>
+{% endblock %} 
+
+<!-- script block -->
+{% block scripts %}
+<script>
+	function binSelectFilter(){
+		$('.filters').change(function(){
+			$('#filterform').submit();
+		})
+	}
+
+	// Function for record click
+	function trclick(a){
+		document.location = a.getAttribute('uid');
+	}
+
+	// Function to add new solution
+	function Add(){
+		// Clear error message
+		$('#addform').find('.error-message').empty();
+		$.ajax({
+			url: '/logviewer/netlogsolution/add',
+			type: 'post',
+			data:$('#addform').serialize(),
+			dataType: 'JSON',
+			success: function(response) {
+				if (response.status) {
+					alert('Saved successfully');
+					location.reload();
+				} else {
+				// alert('Failed to save: ' + response.error);
+					var errors = response.errors || {};
+					for (var field in errors) {
+						if (errors.hasOwnProperty(field)) {
+						var errorMessages = errors[field];
+						var errorSpan = $('#addform').find('[name=' + field + ']').next('.error-message');
+						errorSpan.text(errorMessages.join(', '));
+						}
+					}
+				}
+			},
+			error: function() {
+				alert('Failed to save');
+			}
+		})
+	}
+	
+	$(function(){
+		binSelectFilter();		
+		var table = $('#maintable').DataTable( {
+			paging: false,
+			order: [[0,'desc']],
+		} );
+		
+		// Function to show modal to add new solution
+		$('#new-btn').click(function() {
+			// Clear error message
+			$('#addform').find('.error-message').empty();
+			$('#myModal').modal('show');
+
+		});	
+
+
+	});
+		
+
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+{% block mainbody %}
+
+
+<!-- Windows Event Logs table-->
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<div class="col">
+				<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item active">Net solution List</li>
+					</ol>
+				</nav>
+			</div>	
+			<!-- <div class="col-1"><a href="add" class="btn btn-primary btn-sm">Add</a></div>	 -->
+		</div>
+		<!-- Filter Area -->				
+		<div class="row">
+			<div class="col-8">				
+				<form method="get" id="filterform">	
+					<div class="row">						
+						{% for field in form %}
+						<div class="col">
+							{{ field }} 
+						</div>					
+						{% endfor %}
+					</div>
+				</form>	
+			</div>	
+			<div class="col">
+				{% if 'LogViewer_Editor' in user_group%}
+					<button id="new-btn" class="btn btn-sm btn-primary">New</button>
+				{% endif %}
+			</div>
+		</div>
+		
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<!-- <table class="display table-hover " id="maintable" style="width:100%">	 -->
+			<table class="table table-hover table-sm" id="maintable">	
+				<thead class="table-light">
+					<tr>
+						<th>ID</th>
+						<th>Solution_ID</th>
+						<th>Date</th>
+						<th>Event_ID</th>
+						<th>Soucce</th>
+						<th>Error_Desc</th>	
+						<th>Severity</th>
+						<th>Fix_By</th>
+						<th>OS</th>
+						<th>Cause&Solution</th>		
+						<th>Action</th>		
+						<th>Status</th>	
+						<th>Add_Date</th>	
+						<th>Add_By</th>								
+						<th>Solution_Date</th>				
+						<th>Solution_By</th>
+						<th>Approve_Date</th>
+						<th>Approve_By</th>
+						<th>Review_Date</th>
+						<th>Review_By</th>
+						<th>Change_Date</th>
+						<th>Change_By</th>
+															
+					</tr>
+				</thead>	
+			
+				<tbody id="tablebody">	
+					{% for i in solution_list %}
+					<tr uid="/logviewer/netlogsolution/detail/{{i.id}}" ondblclick="trclick(this)">
+						<td>{{ i.id }}</td>	
+						<td>{{ i.solution_id }}</td>	
+						<td>{{ i.date |date:"Y-m-d" }}</td>	
+						<td>{{ i.event_id |floatformat:0}}</td>	
+						<td>{{ i.source }}</td>	
+						<td>{{ i.error_desc |truncatechars:20}}</td>	
+						<td>{{ i.severity }}</td>	
+						<td>{{ i.fix_by }}</td>	
+						<td>{{ i.os }}</td>	
+						<td>{{ i.cause |truncatechars:20}}</td>	
+						<td>{{ i.action |truncatechars:20}}</td>	
+						<td>{{ i.get_status_display }}</td>								
+						<td>{{ i.add_date |date:"Y-m-d" }}</td>
+						<td>{{ i.recorder }}</td>	
+						<td>{{ i.solution_date |date:"Y-m-d" }}</td>	
+						<td>{{ i.solution_by }}</td>	
+						<td>{{ i.approve_date |date:"Y-m-d" }}</td>	
+						<td>{{ i.approve_by }}</td>	
+						<td>{{ i.review_date |date:"Y-m-d" }}</td>	
+						<td>{{ i.review_by }}</td>	
+						<td>{{ i.changed_date |date:"Y-m-d" }}</td>	
+						<td>{{ i.changed_by }}</td>	
+												
+					</tr>
+									
+				{% endfor %}
+
+				</tbody>	
+			</table>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal to add new solution -->
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-xl" role="document">
+	<div class="modal-content">
+	<div class="modal-header">
+		<h5 class="modal-title" id="myModalLabel">Add new solution</h5>
+	</div>
+	<div class="modal-body container">
+		<form action="" id="addform">
+			{% csrf_token %} 
+			<div class="row">
+				{% for field in solution_form %}
+					<div class="col-6">
+						<label for="id_{{ field.name }}" >{{ field.label }}</label>
+						{{ field }} <span class="error-message" style="color: red;"></span>
+					</div>
+				{% endfor %}
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-secondary" onclick="Add()">Save</button>
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	</div>
+</div>
+</div>
+{% endblock %}

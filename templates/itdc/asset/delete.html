@@ -1,0 +1,39 @@
+{% extends "itdc/layout.html" %}
+{% block title %}
+    <title>{{asset.category}} delete</title>
+{% endblock %}
+{% block mainbody %}
+
+
+<form  method="post">
+	{% csrf_token %}  
+	<div class="row justify-content-md-center">				
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="col">
+						<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="/itdc/asset/list">Asset List</a></li>
+								<li class="breadcrumb-item active">{{asset.category}} delete</li>
+							</ol>
+						</nav>
+					</div>	
+				</div>
+				<div class="card-body">
+					<div class="row">			
+						<h4>Are you sure to delete <span style="color: red;">{{asset}}</span> ?</h4>
+						<div class="text-center">
+							<br>
+							<a href="{{list_url}}" class="btn btn-primary">Return</a>
+							<input type="submit" value="Save" class="btn btn-primary">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="container text-center" style="color: red;"><h4>{{msg}}</h4></div>			
+		</div>		
+	</div>	
+  </form>
+
+{% endblock %}

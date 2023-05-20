@@ -1,0 +1,401 @@
+{% extends "logviewer/layout.html" %}
+{% block mainbody %}
+{% block title %}
+    <title>Solution Details - {{solution_obj.solution_id}}</title>
+{% endblock %}
+	<div class="row justify-content-md-center">				
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col">
+							<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+								<ol class="breadcrumb">
+									<li class="breadcrumb-item"><a href="/logviewer/netlogsolution/list">Net solution list</a></li>
+									<li class="breadcrumb-item active">Solution detail</li>
+								</ol>
+							</nav>
+						</div>
+						
+						<div class="col-6">
+							{% if solution_obj.status == '1' or solution_obj.status == '2' %}
+								{% if 'LogViewer_Editor' in user_group%}
+									<button type="button" class="btn btn-sm btn-primary" id="edit-btn">Edit Basic</button>	
+								{% endif %}
+								{% if 'LogViewer_SolutionProvider' in user_group and fixby_group in user_group%}							
+									<button type="button" class="btn btn-sm btn-primary" id="editcause-btn">Edit Cause</button>	
+								{% endif %}
+							{% endif %}	
+							{% if solution_obj.status == '2' %}
+								{% if 'LogViewer_Approver' in user_group and fixby_group in user_group%}	
+									<button type="button" class="btn btn-sm btn-primary" id="approve-btn">Approve</button>
+								{% endif %}	
+							{% endif %}	
+							{% if solution_obj.status == '3' %}
+								{% if 'LogViewer_Reviewer' in user_group%}	
+									<button type="button" class="btn btn-sm btn-primary" id="review-btn">Review</button>
+								{% endif %}	
+							{% endif %}		
+							{% if solution_obj.status == '4' or solution_obj.status == '3' %}
+								{% if 'LogViewer_Approver' in user_group and fixby_group in user_group%}	
+									<button type="button" class="btn btn-sm btn-primary" id="unapprove-btn">Unapprove</button>
+								{% endif %}	
+							{% endif %}		
+						</div>
+												
+					</div>	
+					
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="row"><div class="col-3">Solution ID:</div><div class="col">{{solution_obj.solution_id}}</div></div>
+						<div class="row"><div class="col-3">Event ID:</div><div class="col">{{solution_obj.event_id}}</div></div>
+						<div class="row"><div class="col-3">Date:</div><div class="col">{{solution_obj.date}}</div></div>
+						<div class="row"><div class="col-3">Source:</div><div class="col">{{solution_obj.source}}</div></div>
+						<div class="row"><div class="col-3">Error Description:</div><div class="col">{{solution_obj.error_desc}}</div></div>
+						<div class="row"><div class="col-3">Fix By:</div><div class="col">{{solution_obj.fix_by}}</div></div>
+						<div class="row"><div class="col-3">OS:</div><div class="col">{{solution_obj.os}}</div></div>
+						<div class="row"><div class="col-3">Status:</div><div class="col">{{solution_obj.get_status_display}}</div></div>
+						<div class="row"><div class="col-3">Cause&Solution:</div><div class="col">{{solution_obj.cause}}</div></div>
+						<div class="row"><div class="col-3">Action Need:</div><div class="col">{{solution_obj.action}}</div></div>					
+						<div class="row"><div class="col-3">Recorder:</div><div class="col">{{solution_obj.recorder}}</div></div>					
+						<div class="row"><div class="col-3">Add Date:</div><div class="col">{{solution_obj.add_date |date:"Y-m-d"}}</div></div>					
+						<div class="row"><div class="col-3">Solution By:</div><div class="col">{{solution_obj.solution_by}}</div></div>					
+						<div class="row"><div class="col-3">Solution Date:</div><div class="col">{{solution_obj.solution_date |date:"Y-m-d"}}</div></div>					
+						<div class="row"><div class="col-3">Approve By:</div><div class="col">{{solution_obj.approve_by}}</div></div>					
+						<div class="row"><div class="col-3">Approve Date:</div><div class="col">{{solution_obj.approve_date |date:"Y-m-d"}}</div></div>					
+						<div class="row"><div class="col-3">Review By:</div><div class="col">{{solution_obj.review_by}}</div></div>					
+						<div class="row"><div class="col-3">Review Date:</div><div class="col">{{solution_obj.review_date |date:"Y-m-d"}}</div></div>					
+					</div>
+				</div>
+			</div>			
+		</div>	
+		<p></p>
+		<!-- History card -->
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header text-center">
+					History	
+				</div>
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-hover table-sm" id="historytable">	
+							<thead class="table-light">
+								<tr>
+									<th>Date_Time</th>
+									<th>Operator</th>
+									<th>Action</th>
+									<th>Comment</th>				
+								</tr>
+							</thead>	
+						
+							<tbody id="historybody">	
+								{% for i in history %}
+								<tr>
+									<td>{{ i.create_time|date:"Y-m-d" }} {{ i.create_time|time }}</td>
+									<td>{{ i.operator }}</td>
+									<td>{{ i.action }}</td>
+									<td>{{ i.comment }}</td>				
+								</tr>
+												
+							{% endfor %}
+					
+							</tbody>	
+						</table>
+					</div>
+				</div>
+			</div>			
+		</div>		
+	</div>	
+
+	<!-- Modal to edit solution -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="myModalLabel">Edit solution</h5>
+				</div>
+				<div class="modal-body container">
+					<form action="" id="editform">
+						{% csrf_token %} 
+						<div class="row">
+							{% for field in edit_form %}
+								<div class="col-6">
+									<label for="id_{{ field.name }}" >{{ field.label }}</label>
+									{{ field }} <span class="error-message" style="color: red;"></span>
+								</div>
+							{% endfor %}
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" onclick="Save()">Save</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal to edit cause -->
+	<div class="modal fade" id="myCauseModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="myModalLabel">Edit solution</h5>
+				</div>
+				<div class="modal-body container">
+					<form action="" id="causeform">
+						{% csrf_token %} 
+						<div class="row">
+							{% for field in cause_form %}
+								<div class="col-6">
+									<label for="id_{{ field.name }}" >{{ field.label }}</label>
+									{{ field }} <span class="error-message" style="color: red;"></span>
+								</div>
+							{% endfor %}
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" onclick="CauseSave()">Save</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+<!-- Modal to approve solution -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xs">
+		<div class="modal-content">
+			<div class="modal-header">
+			</div>
+			<div class="modal-body">
+					<h4>Are you sure to approve?</h4>
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-primary"  onclick="Approve()">Continue</button>
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal to unapprove solution -->
+<div class="modal fade" id="unapproveModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xs">
+		<div class="modal-content">
+			<div class="modal-header">
+			</div>
+			<div class="modal-body">
+					<h4>Are you sure to unapprove?</h4>
+					<form action="" id="unapproveform">
+						{% csrf_token %} 
+						<div class="mb-3">
+							<label for="comment" class="form-label">Comment:</label>
+							<textarea class="form-control" name="comment" rows="2"></textarea>
+						  </div>
+					</form>
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-primary"  onclick="UnApprove()">Continue</button>
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal to review solution -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xs">
+		<div class="modal-content">
+			<div class="modal-header">
+			</div>
+			<div class="modal-body">
+					<h4>Are you sure to review?</h4>
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-primary"  onclick="Review()">Continue</button>
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+	// Function for record click
+	function trclick(a){
+		document.location = a.getAttribute('uid');
+		// window.open(a.getAttribute('uid'));
+	}
+
+	// Function to save solution(Basic information)
+	function Save(){
+		// Clear error message
+		$('#editform').find('.error-message').empty();
+		$.ajax({
+			url: '/logviewer/netlogsolution/edit/{{ solution_obj.id }}',
+			type: 'post',
+			data:$('#editform').serialize(),
+			dataType: 'JSON',
+			success: function(response) {
+				if (response.status) {
+					alert('Saved successfully');
+					location.reload();
+				} else {
+				alert('Failed to save: ' + response.message);
+					var errors = response.errors || {};
+					for (var field in errors) {
+						if (errors.hasOwnProperty(field)) {
+						var errorMessages = errors[field];
+						var errorSpan = $('#editform').find('[name=' + field + ']').next('.error-message');
+						errorSpan.text(errorMessages.join(', '));
+						}
+					}
+				}
+			},
+			error: function() {
+				alert('Failed to save');
+			}
+		})
+	}
+
+	// Function to approve solution
+	function Approve(){
+		$.ajax({
+			url: '/logviewer/netlogsolution/approve/{{ solution_obj.id }}',
+			type: 'post',
+			data: {
+				csrfmiddlewaretoken: '{{ csrf_token }}',
+			},
+			dataType: 'JSON',
+			success: function(response) {
+				if (response.status) {
+					alert('Approved successfully');
+					location.reload();
+				} else {
+					alert('Failed to approve: ' + response.errors);					
+				}
+			},
+			error: function() {
+				alert('Failed to approve');
+			}
+		})
+	}
+
+	// Function to review solution
+	function Review(){
+		$.ajax({
+			url: '/logviewer/netlogsolution/review/{{ solution_obj.id }}',
+			type: 'post',
+			data: {
+				csrfmiddlewaretoken: '{{ csrf_token }}',
+			},
+			dataType: 'JSON',
+			success: function(response) {
+				if (response.status) {
+					alert('Reviewed successfully');
+					location.reload();
+				} else {
+					alert('Failed to review: ' + response.errors);					
+				}
+			},
+			error: function() {
+				alert('Failed to review');
+			}
+		})
+	}
+
+	// Function to unapprove solution
+	function UnApprove(){
+		$.ajax({
+			url: '/logviewer/netlogsolution/unapprove/{{ solution_obj.id }}',
+			type: 'post',
+			data: $('#unapproveform').serialize(),
+			dataType: 'JSON',
+			success: function(response) {
+				if (response.status) {
+					alert('UnApprove successfully');
+					location.reload();
+				} else {
+					alert('Failed to unapprove: ' + response.errors);					
+				}
+			},
+			error: function() {
+				alert('Failed to unapprove');
+			}
+		})
+	}
+
+	// Function to save solution(Cause related)
+	function CauseSave(){
+		// Clear error message
+		$('#causeform').find('.error-message').empty();
+		$.ajax({
+			url: '/logviewer/netlogsolution/causeedit/{{ solution_obj.id }}',
+			type: 'post',
+			data:$('#causeform').serialize(),
+			dataType: 'JSON',
+			success: function(response) {
+				if (response.status) {
+					alert('Saved successfully');
+					location.reload();
+				} else {
+				alert('Failed to save: ' + response.message);
+					var errors = response.errors || {};
+					for (var field in errors) {
+						if (errors.hasOwnProperty(field)) {
+						var errorMessages = errors[field];
+						var errorSpan = $('#causeform').find('[name=' + field + ']').next('.error-message');
+						errorSpan.text(errorMessages.join(', '));
+						}
+					}
+				}
+			},
+			error: function() {
+				alert('Failed to save');
+			}
+		})
+	}
+	
+	$(function(){
+		// Function to show modal to edit solution
+		$('#edit-btn').click(function() {
+			// Clear error message
+			$('#editform').find('.error-message').empty();
+			$('#myModal').modal('show');
+
+		});	
+
+		// Function to show modal to edit cause
+		$('#editcause-btn').click(function() {
+			// Clear error message
+			$('#causeform').find('.error-message').empty();
+			$('#myCauseModal').modal('show');
+
+		});
+
+		// Function to show modal to approve
+		$('#approve-btn').click(function() {
+			$('#approveModal').modal('show');
+
+		});
+
+		// Function to show modal to review
+		$('#review-btn').click(function() {
+			$('#reviewModal').modal('show');
+
+		});
+
+		// Function to show modal to unapprove
+		$('#unapprove-btn').click(function() {
+			$('#unapproveModal').modal('show');
+
+		});
+	})
+</script>
+{% endblock %}

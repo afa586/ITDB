@@ -1,0 +1,41 @@
+{% extends "itasset/layout.html" %}
+{% block title %}
+    <title>{{title}}</title>
+{% endblock %}
+{% block mainbody %}
+  <form  method="post">
+	{% csrf_token %}  
+	<div class="row justify-content-md-center">				
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="/itasset/user/list">User List</a></li>
+								<li class="breadcrumb-item active">{{title}}</li>
+							</ol>
+						</nav>
+					</div>
+					</div>
+				<div class="card-body">
+					<div class="row">			
+						{% for field in form %}
+							<div class="col-6">
+								<label for="id_{{ field.name }}" >{{ field.label }}</label>
+								{{ field }} <span style="color:red">{{ field.errors.0 }}</span>
+							</div>
+						{% endfor %}
+						<div class="text-center">
+							<br>
+							<p><input type="submit" value="Save" class="btn btn-primary"></p>
+						</div>
+					</div>
+				</div>
+			</div>			
+		</div>		
+	</div>	
+
+  </form>
+
+{% endblock %}

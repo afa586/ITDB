@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+<!-- Main body block -->
+{% block mainbody %}
+<div class="container">
+	<div class="row">
+		<div style="height: 100px;"></div>
+		<div class="col" style="padding: 15px;">
+			<div class="card col" style="width: 13rem;">
+				<img src="/static/imgs/settings.png" %}" class="card-img-top" alt="...">
+				<div class="card-body">
+				<h5 class="card-title">Admin Settings</h5>
+				<p class="card-text">Manage admin users and flexible settings!</p>
+				<a href="/admin" class="btn btn-primary">Go</a>
+				</div>
+			</div>
+		</div>
+	
+		<div class="col" style="padding: 15px;">
+			<div class="card" style="width: 13rem;">
+				<img src="/static/imgs/documents.png" class="card-img-top" alt="...">
+				<div class="card-body">
+				<h5 class="card-title">Documents</h5>
+				<p class="card-text">Manage shared documents!</p>
+				<a href="/document" class="btn btn-primary">Go</a>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col" style="padding: 15px;">
+			<div class="card" style="width: 13rem;">
+				<img src="/static/imgs/assets.png" class="card-img-top" alt="...">
+				<div class="card-body">
+				<h5 class="card-title">IT Assets</h5>
+				<p class="card-text">Manage computers, printers...</p>
+				<a href="/itasset" class="btn btn-primary">Go</a>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col" style="padding: 15px;">
+			<div class="card" style="width: 13rem;">
+				<br>
+				<img src="/static/imgs/datacenter.png" class="card-img-top" alt="...">
+				<p></p>
+				<div class="card-body">
+				<h5 class="card-title">Data center</h5>
+				<p class="card-text">Manage servers, network devices...</p>
+				<a href="/itdc" class="btn btn-primary">Go</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

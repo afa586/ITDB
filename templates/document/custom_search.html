@@ -1,0 +1,111 @@
+{% extends "document\layout.html" %}
+
+{% block title %}
+<title>Custom Search</title>
+{% endblock %}   
+
+<!-- script block -->
+{% block scripts %}
+<script>
+	function CopyPath(a){
+		keyTxt = a.getAttribute('uid')
+		toastLiveExample = document.getElementById('copy_toast');
+		const toast = new bootstrap.Toast(toastLiveExample);	
+		// alert(keyTxt)
+		if (!navigator.clipboard) {
+			alert('Copy functionality not supported');
+			} else {
+				try {
+				navigator.clipboard.writeText(keyTxt);			
+				$('#copy_body').text(keyTxt);
+				toast.show();
+
+			} catch (err) {
+				alert(err)
+			}
+		}
+	}
+
+	$(function(){
+		$('#maintable').DataTable( {
+			dom: '<"row"<"col-4"B><"col-4"i><"col-4"f>>rt<"row"<"col-6"l><"col-6"p>>',
+			order: [[1,'desc']],
+			// stateSave: true,
+    		// paging: false,
+			// scrollY: 400,			
+			'buttons': [
+						{  
+                        extend: 'excelHtml5',  
+                        text: 'Export excel',
+						className:'btn btn-light',                                                  
+                       	}  
+			]
+		} );
+	} );
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+{% block mainbody %}
+
+<!-- Table Area -->
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/document">Home</a></li>					
+					<li class="breadcrumb-item active">Custom search</a></li>
+				</ol>
+			</nav>
+		</div>
+		<!-- Search Area -->
+		<div class="row">	
+			<form method="get" id="searchform">
+				<div class="row">
+					{% for field in form %}
+					<div class="col">
+						{{ field }} 
+					</div>					
+					{% endfor %}				
+					<div class="col-1">
+						<input type="submit" value="Search" class="btn btn-outline-primary">	
+					</div>								
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">
+				<thead class="table-light">
+					<tr>
+						{% for i in tableHead %}
+						<th>{{ i }}</th>
+						{% endfor %}				
+					</tr>
+				</thead>
+				<tbody>
+				{% for item in tableBody %}
+					<tr>	
+						<td>
+							<a href="file:///{{item.2}}\{{item.0}}">{{item.0}}</a>
+							<input type="button" value="Copy" uid="{{item.2}}\{{item.0}}" class="btn btn-light btn-sm" onclick="CopyPath(this)">					
+						</td>
+						<td>{{item.1|date:"Y-m-d"}} {{item.1|time}}</td>
+						<td>					
+							<a href="file:///{{item.2}}">{{item.2}}</a>
+							<input type="button" value="Copy" uid="{{item.2}}" class="btn btn-light btn-sm" onclick="CopyPath(this)">
+						</td>
+					</tr>					
+				{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends "itdc/layout.html" %}
+{% block title %}
+    <title>{{category|default:"Asset"}} list</title>
+{% endblock %}
+<!-- script block -->
+{% block scripts %}
+<script>
+	function binSelectFilter(){
+		$('.filters').change(function(){
+			$('#filterform').submit();
+		})
+	}
+
+	// Function for record click
+	function trclick(a){
+		document.location = a.getAttribute('uid');
+		// window.open(a.getAttribute('uid'));
+	}
+
+	$(function(){
+		binSelectFilter();
+		$('#maintable').DataTable( {
+			dom: '<"row"<"col-4"B><"col-4"i><"col-4"f>>rt<"row"<"col-6"l><"col-6"p>>',
+    		paging: false,
+			// scrollY: 400,	
+			// stateSave: true,
+			select: {
+				style: 'single'
+			},		
+			'buttons': [
+						{  
+                        extend: 'excelHtml5',  
+                        text: 'Export',
+						className:'btn btn-light',                                                  
+                       	},
+						{  
+                        extend: 'colvis',  
+                        text: 'Columns',
+						className:'btn btn-light',                                                  
+                       	},
+
+			] 
+		} );
+		// Hide columns with no data
+		$('#maintable').DataTable().columns().every(function() {
+			var columnData = this.data();
+			var isEmpty = true;
+			for (var i = 0; i < columnData.length; i++) {
+				if (columnData[i] !== '-' && columnData[i] !== '') {
+					isEmpty = false;
+					break;
+				}
+			}
+			if (isEmpty) {
+				this.visible(false);
+			}
+		});	
+	} );
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+
+
+{% block mainbody %}
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<div class="row">
+				<div class="col">
+					<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="/itdc">Home</a></li>
+							<li class="breadcrumb-item active">{{category|default:"Asset"}} list</li>
+						</ol>
+					</nav>
+				</div>
+			{% if category %}
+			<div class="col-1"><a href="add?category={{category}}" class="btn btn-primary btn-sm">Add</a></div>
+			{% endif %}
+		</div>		
+		</div>
+		<!-- Filter Area -->
+		<form method="get" id="filterform">				
+			<div class="row">							
+				{% for field in form %}
+				<div class="col">
+					{{ field }} 
+				</div>					
+				{% endfor %}
+			</div>
+		</form>	
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">
+				<thead class="table-light">
+					<tr>
+						<th>Name</th>
+						<th>Category</th>
+						<th>Location</th>
+						<th>Model</th>
+						<th>SN</th>
+						<th>Container</th>	
+						<th>OS</th>
+						<th>Software_key</th>
+						<th>CPU</th>
+						<th>Memory</th>		
+						<th>HDD</th>				
+						<th>IS_Active</th>
+						<th>IS_PowerOn</th>
+						<th>Is_Container</th>
+						<th>Purchase_Date</th>
+						<th>Expire_Date</th>
+						<th>Price</th>
+						<th>Vendor</th>													
+						<th>Comment</th>	
+					</tr>
+				</thead>
+				<tbody>
+				{% for obj in asset_list %}
+					<tr uid="detail?pk={{obj.id}}" ondblclick="trclick(this)">
+						<td>{{obj.name}}</td>
+						<td>{{obj.category}}</td>
+						<td>{{obj.location}}</td>
+						<td>{{obj.model|default:'-'}}</td>
+						<td>{{obj.sn|default:'-'}}</td>
+						<td>{{obj.container|default:'-'}}</td>
+						<td>{{obj.os|default:'-'}}</td>
+						<td>
+							{% for i in obj.software_set.all %}
+							<a href="/itdc/software/detail?pk={{i.id}}">{{i}}</a>
+							{% endfor %}
+						</td>
+						<td>{{obj.cpu|default:'-'}}</td>
+						<td>{{obj.memory|default:'-'}}</td>
+						<td>{{obj.hdd|default:'-'}}</td>
+						<td>{{obj.is_active}}</td>
+						<td>{{obj.is_poweron}}</td>
+						<td>{{obj.is_container}}</td>
+						<td>{{obj.purchase_date|default:'-'|date:"Y-m-d"}}</td>
+						<td>{{obj.expire_date|default:'-'|date:"Y-m-d"}}</td>
+						<td>{{obj.price|default:'-'}}</td>
+						<td>{{obj.vendor|default:'-'}}</td>
+						<td>{{obj.comment|default:'-'}}</td>
+					</tr>					
+				{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}
+    <title>IT DC</title>
+    {% endblock %}
+    {% load static %}   
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'DataTables/datatables.min.css' %}?"{% now "U" %}>
+    
+</head>
+<body>
+  
+  <nav class="navbar navbar-expand-lg bg-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/"><img src="/static/Logo.png"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/logviewer">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/logviewer/netlog/list">Net log list</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/logviewer/netlogsolution/list">Net solution list</a>
+          </li>      
+        </ul>
+        <form class="d-flex" role="search" action="/itdc/search" method="get">
+          <input class="form-control me-2" type="search" placeholder="name" aria-label="Search" name="keywords" required value="{{ keywords }}">
+        </form>
+        
+        <div class="col-3"></div>
+      </div>
+    </div>
+  </nav>
+  <div class="row" style="height: 80px;"></div>
+  <div class="container">
+          {% block mainbody %}
+          {% endblock %}
+  </div> 
+  <script src="{% static 'jQuery/jquery-3.6.1.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'DataTables/datatables.min.js' %}?"{% now "U" %}></script>
+</body>
+{% block scripts %}
+{% endblock %}
+</html>

@@ -1,0 +1,211 @@
+{% extends "itasset/layout.html" %}
+{% block mainbody %}
+{% block title %}
+    <title>User Details</title>
+{% endblock %}
+
+	<div class="row justify-content-md-center">				
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col">
+							<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+								<ol class="breadcrumb">
+									<li class="breadcrumb-item"><a href="/itasset/user/list">User List</a></li>
+									<li class="breadcrumb-item active">User details</li>
+								</ol>
+							</nav>
+						</div>
+						<div class="col-6">
+							<!-- <div class="row"> -->
+								{% if 'Editor' in group_list%}
+								<!-- <a href="add" class="btn btn-sm btn-light col">Add</a> -->								
+								<a href="clone?pk={{user.id}}" class="btn btn-sm btn-primary">Clone</a>
+								{% if user.is_active %}
+								<a href="edit?pk={{user.id}}" class="btn btn-sm btn-primary">Edit</a>
+									<button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">Assign_asset</button>
+									<a class="btn btn-sm btn-primary" href="resign?pk={{user.id}}">Resign</a>
+								{% endif %}
+								{% endif %}
+							<!-- </div> -->
+						</div>		
+					</div>	
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-3">Name:</div><div class="col-9">{{user.name}}</div>
+						<div class="col-3">Account:</div><div class="col-9">{{user.account}}</div>
+						<div class="col-3">Company:</div><div class="col-9">{{user.company}}</div>
+						<div class="col-3">Department:</div><div class="col-9">{{user.department}}</div>
+						<div class="col-3">Location:</div><div class="col-9">{{user.location}}</div>
+						<div class="col-3">Is Active:</div><div class="col-9">{{user.is_active}}</div>
+						<div class="col-3">Comment:</div><div class="col-9">{{user.comment}}</div>
+					</div>
+				</div>
+			</div>			
+		</div>	
+		<p></p>
+
+		<div class="col-md-8"> 
+			{% if asset_list %}
+			<div class="card">
+				<div class="card-header text-center">
+						Asset(s) assigned to the user
+				</div>
+				<div class="card-body">	
+					<div class="row">
+						<div class="table-resonsive">
+							<table class="table table-hover table-sm" id="assettable">	
+								<thead>
+									<tr>		
+										<th>Name</th>
+										<th>Company</th>
+										<th>SN</th>
+										<th>Category</th>		
+										<th>Model</th>										
+										<th>Status</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for i in asset_list %}
+									<tr uid="/itasset/asset/detail?pk={{i.id}}" ondblclick="trclick(this)">										
+										<td>{{ i.name }}</td>
+										<td>{{ i.company }}</td>
+										<td>{{ i.sn }}</td>
+										<td>{{ i.category }}</td>
+										<td>{{ i.model }}</td>
+										<td>{{ i.status }}</td>							
+									</tr>					
+									{% endfor %}
+								</tbody>
+							</table>			
+						</div>
+					</div>
+				</div>
+			</div>	
+			{% endif %}		
+		</div>		
+		<p></p>
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header text-center">
+					<div class="col">History</div>	
+				</div>
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-hover table-sm" id="historytable">	
+							<thead class="table-light">
+								<tr>
+									<th>Date_Time</th>
+									<th>Operator</th>
+									<th>Action</th>
+									<th>Comment</th>				
+								</tr>
+							</thead>	
+						
+							<tbody id="historybody">	
+								{% for i in history %}
+								<tr>
+									<td>{{ i.create_time|date:"Y-m-d" }} {{ i.create_time|time }}</td>
+									<td>{{ i.operator }}</td>
+									<td>{{ i.action }}</td>
+									<td>{{ i.comment }}</td>				
+								</tr>
+												
+							{% endfor %}
+					
+							</tbody>	
+						</table>
+					</div>
+				</div>
+			</div>			
+		</div>		
+	</div>	
+
+	<!-- Modal for asset assign -->
+	<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLabel">Asset assign</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<!-- <div class="card"> -->
+					<div class="table-resonsive">
+						<table class="table table-hover table-sm" id="assigntable">	
+							<thead>
+								<tr>						
+									<th>Name</th>
+									<th>SN</th>
+									<th>Category</th>		
+									<th>Model</th>
+									<th>Company</th>
+									<th>Comment</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for i in available_asset_list %}
+								<tr uid="/itasset/asset/assign?pk={{i.id}}&uid={{user.id}}" ondblclick="trclick(this)">
+									<td>
+										{{ i.name }}
+									</td>
+									<td>
+										{{ i.sn }}
+									</td>
+									<td>
+										{{ i.category }}
+									</td>
+									<td>
+										{{ i.model }}
+									</td>
+									<td>
+										{{ i.company }}
+									</td>
+									<td>
+										{{ i.comment }}
+									</td>					
+								</tr>					
+								{% endfor %}
+							</tbody>
+						</table>			
+					</div>
+				<!-- </div> -->
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	// Function for record click
+	function trclick(a){
+		document.location = a.getAttribute('uid');
+		// window.open(a.getAttribute('uid'));
+	}
+
+	$(function(){
+		$('#assettable').DataTable( {
+			dom: '<"row"<"col-4"><"col-4"><"col-4"f>>rt<"row"<"col-6"l><"col-6"p>>',
+			paging: false,
+			scrollY: 100,
+		} );		
+		$('#assigntable').DataTable( {
+			paging: false,
+			scrollY: 200,
+			select: {
+				style: 'single'
+			},	
+		} );	
+		// $('tr[data-href]').on("dblclick", function() {
+		// 	document.location = $(this).data('href');
+		// 	// window.open($(this).data('href'));
+		// });	
+	})
+</script>
+{% endblock %}

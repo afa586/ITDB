@@ -1,0 +1,504 @@
+{% extends "itdc/layout.html" %}
+{% block mainbody %}
+{% block title %}
+    <title>{{asset.category}} details</title>
+{% endblock %}
+	<div class="row justify-content-md-center">				
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col">
+							<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+								<ol class="breadcrumb">
+									<li class="breadcrumb-item"><a href="/itdc/asset/list">Asset List</a></li>
+									<li class="breadcrumb-item active">{{asset.category}} details</li>
+								</ol>
+							</nav>
+						</div>
+						<div class="col-6">
+							<a href="add?category={{asset.category}}" class="btn btn-primary btn-sm">Add</a>
+							<a href="edit?pk={{asset.id}}&category={{asset.category}}" class="btn btn-primary btn-sm">Edit</a>
+							<a href="clone?pk={{asset.id}}&category={{asset.category}}" class="btn btn-primary btn-sm">Clone</a>
+							<a href="delete?pk={{asset.id}}&category={{asset.category}}" class="btn btn-primary btn-sm">Delete</a>
+						</div>	
+					</div>	
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-6">Location:</div><div class="col-6">{{asset.location}}</div>
+						<div class="col-6">Asset Name:</div><div class="col-6">{{asset.name}}</div>
+						{% if asset.sn %}
+						<div class="col-6">Asset SN:</div><div class="col-6">{{asset.sn}}</div>
+						{% endif %}
+						{% if asset.purchase_date %}
+						<div class="col-6">Purchase Date:</div><div class="col-6">{{asset.purchase_date}}</div>
+						{% endif %}
+						{% if asset.os %}
+						<div class="col-6">OS:</div><div class="col-6">{{asset.os}}</div>
+						{% endif %}						
+						<div class="col-6">Create By:</div><div class="col-6">{{asset.create_by}}</div>
+						<div class="col-6">Create Time:</div><div class="col-6">{{ asset.create_time|date:"Y-m-d" }} {{ asset.create_time|time }}</div>
+						{% if asset.container %}
+						<div class="col-6">Container:</div><div class="col-6"><a href="/itdc/asset/detail?pk={{asset.container.id}}">{{asset.container}}</a></div>
+						{% endif %}	
+						{% if asset.cpu %}
+						<div class="col-6">CPU:</div><div class="col-6">{{asset.cpu}}</div>
+						{% endif %}	
+						{% if asset.memory %}
+						<div class="col-6">Memory:</div><div class="col-6">{{asset.memory}}</div>
+						{% endif %}	
+						<div class="col-6">IS_Active:</div><div class="col-6">{{asset.is_active}}</div>
+						<div class="col-6">Is_Poweron:</div><div class="col-6">{{asset.is_poweron}}</div>
+						<div class="col-6">Is_Container:</div><div class="col-6">{{asset.is_container}}</div>
+						{% if asset.expire_date %}
+						<div class="col-6">Expire_Date:</div><div class="col-6">{{asset.expire_date|date:"Y-m-d"}}</div>
+						{% endif %}	
+						{% if asset.price %}
+						<div class="col-6">Price:</div><div class="col-6">{{asset.price}}</div>
+						{% endif %}	
+						{% if asset.vendor %}
+						<div class="col-6">Vendor:</div><div class="col-6">{{asset.vendor}}</div>
+						{% endif %}	
+						{% if asset.comment %}
+						<div class="col-6">Comment:</div><div class="col-6">{{asset.comment}}</div>
+						{% endif %}	
+						{% if asset.ipaddress_set.all %}
+						<div class="col-6">IP:</div><div class="col-6">
+							{% for i in asset.ipaddress_set.all %}
+							<a href="/itdc/ip/detail?pk={{i.id}}">{{i}}</a>
+							{% endfor %}
+						</div>
+						{% endif %}	
+						{% if asset.software_set.all %}
+						<div class="col-6">Software License:</div>
+						<div class="col-6">
+							{% for i in asset.software_set.all %}
+							<a href="/itdc/software/detail?pk={{i.id}}">{{i}}</a>
+							{% endfor %}
+						</div>	
+						{% endif %}				
+					</div>
+				</div>
+			</div>	
+			<p></p>					
+		</div>
+		<!-- Contained asset information -->
+		{% if contained_assets%}
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					Contained assets
+				</div>
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-hover table-sm" id="maintable">
+							<thead class="table-light">
+								<tr>
+									<th>Name</th>
+									<th>Category</th>
+									<th>Location</th>
+									<th>Model</th>
+									<th>SN</th>
+									<th>Container</th>	
+									<th>OS</th>
+									<th>Software_key</th>
+									<th>CPU</th>
+									<th>Memory</th>		
+									<th>HDD</th>				
+									<th>IS_Active</th>
+									<th>IS_PowerOn</th>
+									<th>Is_Container</th>
+									<th>Purchase_Date</th>
+									<th>Expire_Date</th>
+									<th>Price</th>
+									<th>Vendor</th>													
+									<th>Comment</th>	
+								</tr>
+							</thead>
+							<tbody>
+							{% for obj in contained_assets %}
+								<tr>
+									<td><a href="detail?pk={{obj.id}}">{{obj.name}}</a></td>
+									<td>{{obj.category}}</td>
+									<td>{{obj.location}}</td>
+									<td>{{obj.model|default:'-'}}</td>
+									<td>{{obj.SN|default:'-'}}</td>
+									<td>{{obj.container|default:'-'}}</td>
+									<td>{{obj.os|default:'-'}}</td>
+									<td>
+										{% for i in obj.software_set.all %}
+										<a href="/itdc/software/detail?pk={{i.id}}">{{i}}</a>
+										{% endfor %}
+									</td>
+									<td>{{obj.cpu|default:'-'}}</td>
+									<td>{{obj.memory|default:'-'}}</td>
+									<td>{{obj.hdd|default:'-'}}</td>
+									<td>{{obj.is_active}}</td>
+									<td>{{obj.is_poweron}}</td>
+									<td>{{obj.is_container}}</td>
+									<td>{{obj.purchase_date|default:'-'}}</td>
+									<td>{{obj.expire_date|default:'-'}}</td>
+									<td>{{obj.price|default:'-'}}</td>
+									<td>{{obj.vendor|default:'-'}}</td>
+									<td>{{obj.comment|default:'-'}}</td>
+								</tr>					
+							{% endfor %}
+							</tbody>			
+						</table>
+					</div>
+				</div>			
+			</div>
+			<p></p>
+		</div>
+		{% endif %}
+		<!-- Port information -->
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col">Network Port(s)</div>
+						<div class="col-1">
+	
+								<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal">
+									Add
+								</button>
+						</div>	
+					</div>
+				</div>
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-hover table-sm" id="porttable">
+							<thead class="table-light">
+								<tr>
+									<th></th>
+									<th>Port_Number</th>
+									<th>Connect_To</th>
+									<th>Comment</th>	
+								</tr>
+							</thead>
+							<tbody>
+							{% for obj in asset.networkport_set.all %}
+								<tr>
+									<td>
+										<button type="button" class="btn btn-light btn-sm" uid="{{obj.id}}" onclick="Delete(this)">
+											Delete
+										</button>
+									</td>
+									<td>
+										<button type="button" class="btn btn-light btn-sm" uid="{{obj.id}}" onclick="Edit(this)">
+											{{obj.port_number}}
+										</button>
+									</td>
+									<td>{{obj.connect_to|default:'-'}}</td>
+									<td>{{obj.comment|default:'-'}}</td>						
+								</tr>					
+							{% endfor %}
+							</tbody>
+			
+						</table>
+					</div>
+				</div>
+			</div>	
+
+			
+	</div>
+	<p></p>	
+		<!-- Comment information -->
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col">Comment(s)</div>
+						<div class="col-1">
+
+								<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#commentAddModal">
+									Add
+								</button>
+						</div>	
+					</div>
+				</div>
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-hover table-sm">
+							<thead class="table-light">
+								<tr>
+									<th></th>
+									<th>Create_Time</th>
+									<th>Create_By</th>
+									<th>Comment</th>	
+								</tr>
+							</thead>
+							<tbody>
+							{% for obj in asset.assetcomment_set.all %}
+								<tr>
+									<td><button type="button" class="btn btn-light btn-sm" uid="{{obj.id}}" onclick="DeleteComment(this)">
+										Delete
+									</button></td>
+									<td>{{ obj.create_time|date:"Y-m-d" }} {{ obj.create_time|time }}</td>					
+									<td>{{obj.create_by}}</td>					
+									<td>{{obj.comment}}</td>					
+								</tr>					
+							{% endfor %}
+							</tbody>
+			
+						</table>
+					</div>
+				</div>
+			</div>	
+
+			
+	</div>	
+<!-- Modal to add Network ports -->
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xs">
+	<div class="modal-content">
+		<div class="modal-header">
+		<h5 class="modal-title" id="exampleModalLabel">Add Network Port(s)</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+			<form  method="post" id="addform">
+				{% csrf_token %}  
+
+					<div class="row">			
+						{% for field in portaddform %}
+							<div class="col-12">
+								<label for="id_{{ field.name }}" >{{ field.label }}</label>
+								{{ field }} <span style="color:red">{{ field.errors.0 }}</span>
+							</div>
+						{% endfor %}
+					</div>		
+			
+			  </form>
+		</div>
+		<div class="modal-footer">
+		<button type="button" class="btn btn-secondary" uid="{{asset.id}}" onclick="Add(this)">Save</button>
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		</div>
+	</div>
+	</div>
+</div>
+<!-- Modal to edit Network ports -->
+<div class="modal fade" id="myEditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xs">
+	<div class="modal-content">
+		<div class="modal-header">
+		<h5 class="modal-title" id="exampleModalLabel">Edit Network Port</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+			<form  method="post" id="editform">
+				{% csrf_token %} 
+
+					<div class="row">			
+						{% for field in portform %}
+							<div class="col-12">
+								<label for="id_{{ field.name }}" >{{ field.label }}</label>
+								{{ field }} <span style="color:red">{{ field.errors.0 }}</span>
+							</div>
+						{% endfor %}
+					</div>		
+			
+			  </form>
+		</div>
+		<div class="modal-footer">
+		<button type="button" class="btn btn-secondary" uid="{{asset.id}}" onclick="EditSave()">Save</button>
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		</div>
+	</div>
+	</div>
+</div>
+
+<!-- Modal to delete Network ports -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xs">
+		<div class="modal-content">
+			<div class="modal-header">
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="alert alert-danger">
+
+					<h4>Are you sure to delete?</h4>
+					<p style="margin: 10px 0px;"> Data can't recover after deleted! </p>					
+				</div>
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-danger"  onclick="DeleteSave()">Continue</button>
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+		</div>
+	</div>
+
+<!-- Modal to add comments -->
+<div class="modal fade" id="commentAddModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xs">
+	<div class="modal-content">
+		<div class="modal-header">
+		<h5 class="modal-title" id="exampleModalLabel">Add comment</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+			<form  method="post" id="commentAddForm">
+				{% csrf_token %} 
+
+					<div class="row">			
+						{% for field in commentaddform %}
+							<div class="col-12">
+								<label for="id_{{ field.name }}" >{{ field.label }}</label>
+								{{ field }} <span style="color:red">{{ field.errors.0 }}</span>
+							</div>
+						{% endfor %}
+					</div>		
+			
+			  </form>
+		</div>
+		<div class="modal-footer">
+		<button type="button" class="btn btn-secondary" uid="{{asset.id}}" onclick="AddComment(this)">Save</button>
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		</div>
+	</div>
+	</div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+	// Function to add Network ports
+	function Add(a){
+			$.ajax({
+				url: '/itdc/port/add?assetid=' + a.getAttribute('uid'),
+				type: 'post',
+				data: $('#addform').serialize(),
+				dataType: 'JSON',
+				success: function(res){
+					if (res.status){
+					window.location.reload();
+					}else{
+						alert(res.msg)
+					}				
+				}
+			})
+		}
+
+	// Function to show edit form
+	function Edit(a){
+		edit_id = a.getAttribute('uid');
+		// Empty data in edit form
+		$("#editform")[0].reset();
+		// Get port detail and fill in form
+		$.ajax({
+			url: '/itdc/port/detail?pk=' + edit_id,
+			type: 'get',
+			data: $('#editform').serialize(),
+			dataType: 'JSON',
+			success: function(res){
+				if(res.status){
+					// Add data to form
+					$.each(res.data, function(name, value){
+						$('#id_' + name).val(value);						
+					})
+					// Show modal form
+					$('#myEditModal').modal('show');
+				} else {
+					alert(res.error);
+					window.location.reload();
+				}
+			}
+		})		
+	}
+
+	// Function to show delete form
+	function Delete(a){
+		delete_id = a.getAttribute('uid');
+		$('#deleteModal').modal('show');
+	}
+
+	// Function to save delete
+	function DeleteSave(){
+		$.ajax({
+			url: '/itdc/port/delete?pk=' + delete_id,
+			type: 'post',
+			data: {},
+			dataType: 'JSON',
+			success: function(res){
+				// alert(res.msg);
+				if (res.status){
+					window.location.reload();
+				}else{
+					alert(res.msg)
+				}
+				
+			}
+		})
+	}
+
+	// Function to save edit data to server
+	function EditSave(){
+		$.ajax({
+			url: '/itdc/port/edit?pk=' + edit_id,
+			type: 'post',
+			data: $('#editform').serialize(),
+			dataType: 'JSON',
+			success: function(res){
+				if (res.status){
+					window.location.reload();
+				}else{
+					alert(res.msg)
+				}
+			}
+		})
+	}
+
+	// Function to add comment
+	function AddComment(a){
+			$.ajax({
+				url: '/itdc/asset/addcomment?pk=' + a.getAttribute('uid'),
+				type: 'post',
+				data: $('#commentAddForm').serialize(),
+				dataType: 'JSON',
+				success: function(res){
+					if (res.status){
+					window.location.reload();
+					}else{
+						alert(res.msg)
+					}				
+				}
+			})
+		}
+
+	// Function to delete comment
+	function DeleteComment(a){
+			$.ajax({
+				url: '/itdc/asset/deletecomment',
+				type: 'post',
+				data: {commentid:a.getAttribute('uid')},
+				dataType: 'JSON',
+				success: function(res){
+					if (res.status){
+					window.location.reload();
+					}else{
+						alert(res.msg)
+					}				
+				}
+			})
+		}
+	$(function(){
+		// var edit_id
+		$('#maintable').DataTable( {
+			paging: false,
+			scrollY: 200,
+			stateSave: true,
+		} );		
+		$('#porttable').DataTable( {
+			paging: false,
+			scrollY: 200,
+			stateSave: true,
+		} );		
+	})
+</script>
+{% endblock %}

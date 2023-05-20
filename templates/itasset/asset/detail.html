@@ -1,0 +1,205 @@
+{% extends "itasset/layout.html" %}
+{% block mainbody %}
+{% block title %}
+    <title>Asset Details - {{asset.name}}</title>
+{% endblock %}
+	<div class="row justify-content-md-center">				
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col">
+							<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+								<ol class="breadcrumb">
+									<li class="breadcrumb-item"><a href="/itasset/asset/list">Asset List</a></li>
+									<li class="breadcrumb-item active">Asset detail</li>
+								</ol>
+							</nav>
+						</div>
+						
+						<div class="col-6">		
+							{% if 'Editor' in group_list%}		
+
+								{% if asset.status|lower != 'scrap approved' %}
+								<a href="edit?pk={{asset.id}}" class="btn btn-sm btn-primary">Edit</a>
+								{% endif %}
+								<a href="clone?pk={{asset.id}}" class="btn btn-sm btn-primary">Clone</a>
+								{% if asset.status|lower == 'assigned' %}
+									<a class="btn btn-sm btn-primary" href="/itasset/asset/turnover?pk={{asset.id}}">TurnOver</a>
+								{% endif %}
+								{% if asset.status|lower == 'available' %}
+								<button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">Assign</button>
+								{% endif %}
+								{% if asset.status|lower == 'available' %}
+									<a class="btn btn-sm btn-primary" href="scrap?pk={{asset.id}}">Scrap</a>
+								{% endif %}									
+								
+							{% endif %}	
+							{% if 'Approver' in group_list %}
+								{% if asset.status|lower == 'pending approve' %}
+									<a class="btn btn-sm btn-primary" href="/itasset/asset/approve?pk={{asset.id}}">Approve</a>
+								{% endif %}
+								{% if asset.status|lower == 'scrap request' %}
+									<a class="btn btn-sm btn-primary" href="/itasset/asset/scrapapprove?pk={{asset.id}}">ScrapApprove</a>
+								{% endif %}
+							{% endif %}
+						</div>
+												
+					</div>	
+					
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-3">Category:</div><div class="col-9">{{asset.category}}</div>
+						<div class="col-3">Company:</div><div class="col-9">{{asset.company}}</div>
+						<div class="col-3">Asset Name:</div><div class="col-9">{{asset.name}}</div>
+						<div class="col-3">Model:</div><div class="col-9">{{asset.model}}</div>
+						<div class="col-3">Asset SN:</div><div class="col-9">{{asset.sn}}</div>
+						{% if asset.user.name %}
+						<div class="col-3">User Name:</div><div class="col-9"><a href="/itasset/user/detail?pk={{asset.user.id}}">{{asset.user.name}}</a></div>
+						{% endif %}
+						{% if asset.user.account %}
+						<div class="col-3">User Account:</div><div class="col-9">{{asset.user.account}}</div>
+						{% endif %}
+						<div class="col-3">Status:</div><div class="col-9">{{asset.status}}</div>
+						<div class="col-3">Purchase Date:</div><div class="col-9">{{asset.purchase_date|date:"Y-m-d"}}</div>
+						<div class="col-3">Price:</div><div class="col-9">{{asset.price}}</div>
+						{% if asset.initial_os %}
+						<div class="col-3">Initial OS:</div><div class="col-9">{{asset.initial_os}}</div>
+						{% endif %}
+						{% if asset.os %}
+						<div class="col-3">OS:</div><div class="col-9">{{asset.os}}</div>
+						{% endif %}
+						{% if asset.office %}
+						<div class="col-3">Office:</div><div class="col-9">{{asset.office}}</div>
+						{% endif %}
+						{% if asset.cpu %}
+						<div class="col-3">CPU:</div><div class="col-9">{{asset.cpu}}</div>
+						{% endif %}
+						{% if asset.memory %}
+						<div class="col-3">Memory:</div><div class="col-9">{{asset.memory}}</div>
+						{% endif %}
+						{% if asset.hdd %}
+						<div class="col-3">HDD:</div><div class="col-9">{{asset.hdd}}</div>
+						{% endif %}
+						<div class="col-3">Tanium Lastsee:</div><div class="col-9">{{asset.tanium_lastsee}}</div>
+						<div class="col-3">Create By:</div><div class="col-9">{{asset.create_by}}</div>
+						<div class="col-3">Create Time:</div><div class="col-9">{{asset.create_time|date:"Y-m-d"}}</div>
+						{% if asset.comment %}
+						<div class="col-3">Comment:</div><div class="col-9">{{asset.comment}}</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>			
+		</div>	
+		<p></p>
+		<!-- History card -->
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header text-center">
+					History	
+				</div>
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-hover table-sm" id="historytable">	
+							<thead class="table-light">
+								<tr>
+									<th>Date_Time</th>
+									<th>Operator</th>
+									<th>Action</th>
+									<th>Comment</th>				
+								</tr>
+							</thead>	
+						
+							<tbody id="historybody">	
+								{% for i in history %}
+								<tr>
+									<td>{{ i.create_time|date:"Y-m-d" }} {{ i.create_time|time }}</td>
+									<td>{{ i.operator }}</td>
+									<td>{{ i.action }}</td>
+									<td>{{ i.comment }}</td>				
+								</tr>
+												
+							{% endfor %}
+					
+							</tbody>	
+						</table>
+					</div>
+				</div>
+			</div>			
+		</div>		
+	</div>	
+
+	<!-- Modal for asset assign -->
+	<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLabel">Asset assign</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<!-- <div class="card"> -->
+				<div class="table-resonsive">
+					<table class="table table-hover table-sm" id="usertable">	
+						<thead>
+							<tr>	
+								<th>Name</th>
+								<th>Company</th>
+								<th>Account</th>		
+								<th>Department</th>								
+							</tr>
+						</thead>
+						<tbody>
+							{% for i in user_list %}
+							<tr uid="/itasset/asset/assign?pk={{asset.id}}&uid={{i.id}}" ondblclick="trclick(this)">
+								<td>
+									{{ i.name }}
+								</td>
+								<td>
+									{{ i.company }}
+								</td>
+								<td>
+									{{ i.account }}
+								</td>
+								<td>
+									{{ i.department }}
+								</td>										
+							</tr>					
+							{% endfor %}
+						</tbody>
+					</table>			
+				</div>				
+				<!-- </div> -->
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	// Function for record click
+	function trclick(a){
+		document.location = a.getAttribute('uid');
+		// window.open(a.getAttribute('uid'));
+	}
+
+	$(function(){
+		$('#usertable').DataTable( {
+			paging: false,
+			scrollY: 200,
+			select: {
+				style: 'single'
+			},	
+		} );
+		$('tr[data-href]').on("dblclick", function() {
+			document.location = $(this).data('href');
+			// window.open($(this).data('href'));
+		});			
+	})
+</script>
+{% endblock %}

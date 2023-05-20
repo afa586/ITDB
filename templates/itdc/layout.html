@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}
+    <title>IT DC</title>
+    {% endblock %}
+    {% load static %}   
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'DataTables/datatables.min.css' %}?"{% now "U" %}>
+    
+</head>
+<body>
+  <!-- <nav class="navbar bg-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/"><img src="/static/Logo.png"></a>
+      <div class="col-md-3">      
+        <form class="d-flex" role="search" action="/itdc/search" method="get">
+          <input class="form-control me-2" type="search" placeholder="name" aria-label="Search" name="keywords" required value="{{ keywords }}">
+        </form>
+      </div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class="list-group-item">
+              <a class="nav-link" aria-current="page" href="/itdc">Home</a>
+            </li>
+            <li class="list-group-item">
+              <a class="nav-link" aria-current="page" href="/itdc/asset/list">Asset List</a>
+            </li>
+            <li class="list-group-item">
+              <a class="nav-link" aria-current="page" href="/itdc/software/list">Software</a>
+            </li>
+            <li class="list-group-item">
+              <a class="nav-link" aria-current="page" href="/itdc/ip/list">IP</a>
+            </li>
+            <li class="list-group-item" class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Bulk Action
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/itdc/import/asset">Import Assets</a></li>                                                                  
+              </ul>
+            </li>
+            
+            <li class="list-group-item" class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Reports
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=kunshan">Kunshan Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=singapore">Singapore Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=shanghai">Shanghai Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=xiaoshan">Xiaoshan Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=beijing">Beijing Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=dia">DIA Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=india">India Server structure</a></li>                
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <span class="nav-link"> User: {{ request.user }}</span>
+            </li> 
+          </ul>          
+          
+        </div>
+      </div>
+    </div>
+  </nav> -->
+  <nav class="navbar navbar-expand-lg bg-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/"><img src="/static/Logo.png"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/itdc">Home</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Assets 
+            </a>
+            <ul class="dropdown-menu">              
+              <li><a class="dropdown-item" href="/itdc/asset/list">All Asset List</a></li>   
+              <li><a class="dropdown-item" href="/itdc/asset/list?category=PM">All Physical Machine</a></li>   
+              <li><a class="dropdown-item" href="/itdc/asset/list?category=VM">All Virtual Machine</a></li>   
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/itdc/software/list">Software</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/itdc/ip/list">IP</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Reports
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/itdc/report/diagram?location=kunshan">Kunshan Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=singapore">Singapore Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=shanghai">Shanghai Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=xiaoshan">Xiaoshan Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=beijing">Beijing Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=dia">DIA Server structure</a></li>                                                     
+                <li><a class="dropdown-item" href="/itdc/report/diagram?location=india">India Server structure</a></li>   
+            </ul>
+          </li>        
+        </ul>
+        <form class="d-flex" role="search" action="/itdc/search" method="get">
+          <input class="form-control me-2" type="search" placeholder="name" aria-label="Search" name="keywords" required value="{{ keywords }}">
+        </form>
+        
+        <div class="col-3"></div>
+      </div>
+    </div>
+  </nav>
+  <div class="row" style="height: 80px;"></div>
+  <div class="container">
+          {% block mainbody %}
+          {% endblock %}
+  </div> 
+  <script src="{% static 'jQuery/jquery-3.6.1.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'DataTables/datatables.min.js' %}?"{% now "U" %}></script>
+</body>
+{% block scripts %}
+{% endblock %}
+</html>

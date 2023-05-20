@@ -1,0 +1,199 @@
+{% extends "document\layout.html" %}
+
+{% block title %}
+<title>Home</title>
+{% endblock %}  
+
+<!-- Script block -->
+{% block scripts %}
+<script src="/static/echarts/echarts.min.js"></script>
+<script>
+
+	
+
+	// Create option data for charts
+	barOption = {
+				tooltip: {
+					trigger: 'axis',
+					axisPointer: {
+					// Use axis to trigger tooltip
+					type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+					}
+				},
+				toolbox: {
+					feature: {
+					dataView: { show: true, readOnly: false },
+					saveAsImage: { show: true }
+					}
+				},
+				legend: {},
+				grid: {
+					left: '3%',
+					right: '4%',
+					bottom: '3%',
+					containLabel: true
+				},
+				xAxis: {
+					type: 'value'
+				},
+				yAxis: {
+					type: 'category',
+					data: []
+				},
+				series: []
+				};
+				
+		option_tree = {
+		tooltip: {
+		trigger: 'item',
+		triggerOn: 'mousemove'
+		},
+		series: [
+			{
+			type: 'tree',
+			id: 0,
+			name: 'tree1',
+			data: [],
+			top: '1%',
+			left: '15%',
+			bottom: '1%',
+			right: '45%',
+			symbolSize: 7,
+			edgeShape: 'polyline',
+			edgeForkPosition: '63%',
+			initialTreeDepth: 3,
+			lineStyle: {
+				width: 2
+			},
+			label: {
+				backgroundColor: '#fff',
+				position: 'left',
+				verticalAlign: 'middle',
+				align: 'right'
+			},
+			leaves: {
+				label: {
+				position: 'right',
+				verticalAlign: 'middle',
+				align: 'left'
+				}
+			},
+			emphasis: {
+				focus: 'descendant'
+			},
+			expandAndCollapse: true,
+			animationDuration: 550,
+			animationDurationUpdate: 750
+			}
+		]
+		};
+
+	// Get data from database	
+		$.ajax({
+			url: '/document?folder=all',
+			type: 'get',
+			data: {},
+			dataType: 'JSON',
+			success: function(res){
+				Data = res.data
+				console.log(Data)
+
+				// Create charts
+
+				// Create folder summary
+				Data.forEach(function(item,index){
+					// console.log(item)
+					barOption['yAxis']['data'] = item[1];
+					barOption['series'] = [
+						{
+						name: item[0],
+						type: 'bar',
+						stack: 'total',
+						label: {
+							show: true
+						},
+						emphasis: {
+							focus: 'series'
+						},
+						data: item[2]
+						},
+				]
+				// $('#chartscontainer').append('<div id="documentYear' + index + '" style="height:400px;" class="col-6"></div>')
+				// $('#chartscontainer').append('<div id="documentYear_chartcontainer_' + index + '" class="col-6 card text-center"></div>')
+				// $('#documentYear_chartcontainer_' + index).append('<div class="Text-Center"><h4>' + index + '</h4></div>')
+				// $('#documentYear_chartcontainer_' + index).append('<div id="documentYear' + index + '" style="height:400px;"></div>')
+
+				var html = `
+				<div class="col-6">
+					<div class="card" style="height:400px;">
+						<div class="card-header text-center">								
+								` + item[0] + '(Total ' + item[3] +	`)										
+						</div>
+						<div class="card-body" id="documentYear` + index + `"></div>					
+					</div>	
+					<p></p>				
+				</div>	
+				`;
+				$('#chartscontainer').append(html)
+				// Initialize charts
+				var myChart = echarts.init(document.getElementById('documentYear'+index));
+				// Display the chart using the configuration items and data just specified.
+				myChart.setOption(barOption);
+				});
+				
+				// Create tree summary
+				var html = `
+					<div class="col-6">
+						<div class="card" style="height:400px;">
+							<div class="card-header text-center">Tree Summary</div>
+							<div class="card-body" id="tree_summary"></div>
+						</div>
+						<p></p>
+					</div>
+					`
+					$('#chartscontainer').append(html)
+					var chartDom = document.getElementById('tree_summary');
+					var myChart = echarts.init(chartDom);
+					var arrary_list = [];
+					sum_count = 0
+					Data.forEach(function(item,index){
+						arrary_list.push({name:item[0] + '(' + item[3] + ')',value:item[3]});
+						sum_count += item[3]
+						})
+					option_tree['series'][0]['data'] = [{
+						name:'IT' + '(' + sum_count + ')',
+						children:arrary_list
+					}];
+					console.log(option_tree['series'][0]['data']);
+					option_tree && myChart.setOption(option_tree);
+			}
+		})
+	
+	
+</script>
+{% endblock %}
+
+<!-- Main body block -->
+{% block mainbody %}
+<div class="container">
+	<div class="card">
+		<div class="card-header text-center">
+			<div class="row">
+				<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item active">Home</li>
+					</ol>
+				</nav>
+			</div>
+			
+		</div>
+		<div class="card-body row text-center" id="chartscontainer">
+			<h5>Document summary(Total {{count}})</h5>
+			<p></p>
+		</div>
+		<div class="card-footer text-muted">
+		</div>
+	</div>
+</div>
+
+{% endblock %}

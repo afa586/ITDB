@@ -1,0 +1,39 @@
+{% extends "itasset/layout.html" %}
+{% block title %}
+    <title>Asset turn over</title>
+{% endblock %}
+{% block mainbody %}
+
+
+  <form  method="post">
+	{% csrf_token %}  
+	<div class="row justify-content-md-center">				
+		<div class="col-md-8"> 
+			<div class="card">
+				<div class="card-header">
+					<div class="col">
+						<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="/itasset/asset/list">Asset List</a></li>
+								<li class="breadcrumb-item active">Asset turn over</li>
+							</ol>
+						</nav>
+					</div>
+				</div>
+				<div class="card-body">
+					<div class="row">			
+						<h5>Are you sure to turnover <span style="color: red;">{{asset}}</span>?</h5>
+						<div class="text-center">
+							<br>
+							<a href="/itasset/asset/detail?pk={{asset.id}}" class="btn btn-primary">Cancel</a>
+							<input type="submit" value="Save" class="btn btn-success">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="container text-center" style="color: red;"><h4>{{msg}}</h4></div>			
+		</div>		
+	</div>	
+  </form>
+
+{% endblock %}

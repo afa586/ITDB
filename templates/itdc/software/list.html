@@ -1,0 +1,90 @@
+{% extends "itdc/layout.html" %}
+{% block title %}
+    <title>Software list</title>
+{% endblock %}
+<!-- script block -->
+{% block scripts %}
+<script>
+	function trclick(a){
+		document.location = a.getAttribute('uid');
+		// window.open(a.getAttribute('uid'));
+	}
+	$(function(){
+		$('#maintable').DataTable( {
+			dom: '<"row"<"col-4"B><"col-4"i><"col-4"f>>rt<"row"<"col-6"l><"col-6"p>>',
+    		paging: false,
+			// scrollY: 400,	
+			stateSave: true,
+			select: {
+				style: 'single'
+			},			
+			'buttons': [
+						{  
+                        extend: 'excelHtml5',  
+                        text: 'Export',
+						className:'btn btn-light',                                                  
+                       	}  
+			]
+		} );
+		// $('tr[data-href]').on("dblclick", function() {
+		// 	document.location = $(this).data('href');
+		// 	// window.open($(this).data('href'));
+		// });	
+	} );
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+
+
+{% block mainbody %}
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<div class="col">
+				<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="/itdc">Home</a></li>
+						<li class="breadcrumb-item active">Software List</li>
+					</ol>
+				</nav>
+			</div>
+			<div class="col-1"><a href="add" class="btn btn-primary btn-sm">Add</a></div>
+		</div>		
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">
+				<thead class="table-light">
+					<tr>
+						<th>Name</th>
+						<th>Software_Key</th>
+						<th>Quantity</th>
+						<th>Used_Count</th>						
+						<th>Hosts</th>						
+						<th>Comment</th>	
+					</tr>
+				</thead>
+				<tbody>
+				{% for obj in software_list %}
+					<tr uid="detail?pk={{obj.id}}" ondblclick="trclick(this)">
+						<td>{{obj.name}}</td>
+						<td>{{obj.softwarekey}}</td>
+						<td>{{obj.quantity}}</td>
+						<td>{{obj.used_count}}</td>
+						<td>
+							{% for i in obj.asset.all %}
+							{{i}}</br>
+							{% endfor %}
+						</td>
+						<td>{{obj.comment}}</td>						
+					</tr>					
+				{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+{% endblock %}

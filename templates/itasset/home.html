@@ -1,0 +1,279 @@
+{% extends "itasset/layout.html" %}
+{% load static %}  
+{% block title %}
+    <title>Home</title>
+{% endblock %}
+
+<!-- Script block -->
+{% block scripts %}
+<script src="{% static 'echarts/echarts.min.js' %}"></script>
+<script>
+	// Create option data for charts	
+	var option;
+	var option_tree;
+
+	option = {
+		title: {
+			text: "",
+			left: "center",
+			top: 'bottom',
+			textStyle: {
+			fontSize: 20
+			},		
+		},
+		toolbox: {
+			show: true,
+			feature: {
+			dataView: {
+				readOnly: false
+			},
+			restore: {},
+			saveAsImage: {}
+			}
+		},
+		tooltip: {
+			trigger: 'axis',
+			axisPointer: {
+			// Use axis to trigger tooltip
+			type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+			}
+		},
+		legend: {},
+		grid: {
+			left: '3%',
+			right: '4%',
+			bottom: '8%',	
+			containLabel: true
+		},
+		xAxis: {
+			type: 'value'
+		},
+		yAxis: {
+			type: 'category',
+			data: []
+		},
+		series: []
+	};
+
+	option_tree = {
+		tooltip: {
+		trigger: 'item',
+		triggerOn: 'mousemove'
+		},
+		series: [
+			{
+			type: 'tree',
+			id: 0,
+			name: 'tree1',
+			data: [],
+			top: '1%',
+			left: '15%',
+			bottom: '1%',
+			right: '30%',
+			symbolSize: 7,
+			edgeShape: 'polyline',
+			edgeForkPosition: '63%',
+			initialTreeDepth: 3,
+			lineStyle: {
+				width: 2
+			},
+			label: {
+				backgroundColor: '#fff',
+				position: 'left',
+				verticalAlign: 'middle',
+				align: 'right'
+			},
+			leaves: {
+				label: {
+				position: 'right',
+				verticalAlign: 'middle',
+				align: 'left'
+				}
+			},
+			emphasis: {
+				focus: 'descendant'
+			},
+			expandAndCollapse: true,
+			animationDuration: 550,
+			animationDurationUpdate: 750
+			}
+		]
+		};
+
+	// Get data from database
+	function CreateCharts(){
+		$.ajax({
+			url: '/itasset?data=all',
+			type: 'get',
+			data: {},
+			dataType: 'JSON',
+			success: function(res){
+				Data = res.data
+				console.log(Data)
+				console.log(res.tree_summary)
+
+				// Create charts				
+
+				for (var key in Data){
+					// Create count chart
+					var html = `
+						<div class="col-6">
+							<div class="card" style="height:400px;">
+								<div class="card-header text-center">								
+									` + key + ` - Count										
+								</div>
+								<div class="card-body" id="count_chart_` + key + `"></div>					
+							</div>	
+							<p></p>				
+						</div>	
+					`;
+					$('#chartscontainer').append(html)
+					
+					var chartDom = document.getElementById('count_chart_' + key);
+					var myChart = echarts.init(chartDom);
+					// option['title']['text'] = key + '-Count'; 
+					option['yAxis']['data'] = Data[key][0];
+					option['series'] = [];
+					for (var category_name in Data[key][1]){
+						arr = Data[key][1][category_name][0]
+						let sum = 0;
+						for(let i = 0; i < arr.length; i++){
+							sum += arr[i];
+						}
+						if (sum != 0) {
+							option['series'].push(
+							{
+								name: category_name,
+								type: 'bar',
+								stack: 'total',
+								label: {
+									show: true,
+									formatter: function(params) {
+										if (params.value > 0) {
+											return params.value;
+										} else {
+											return '';
+										}
+									}
+								},
+								emphasis: {
+									focus: 'series'
+								},
+								data: arr
+							});
+						};						
+						
+					};
+				
+					option && myChart.setOption(option);
+					// Create budgetchart
+					var html = `
+						<div class="col-6">
+							<div class="card" style="height:400px;">
+								<div class="card-header text-center">								
+									` + key + ` - Budget										
+								</div>
+								<div class="card-body" id="budget_chart_` + key + `"></div>				
+							</div>	
+							<p></p>				
+						</div>	
+					`;
+					$('#chartscontainer').append(html)
+
+					var chartDom = document.getElementById('budget_chart_' + key);
+					var myChart = echarts.init(chartDom);
+					// option['title']['text'] = key + '-Budget'; 
+					option['yAxis']['data'] = Data[key][0];
+					option['series'] = [];
+					for (var category_name in Data[key][1]){
+						arr = Data[key][1][category_name][1]
+						let sum = 0;
+						for(let i = 0; i < arr.length; i++){
+							sum += arr[i];
+						}
+						if (sum != 0) {
+							option['series'].push(
+							{
+								name: category_name,
+								type: 'bar',
+								stack: 'total',
+								label: {
+									show: true,
+									formatter: function(params) {
+										if (params.value > 0) {
+											return params.value;
+										} else {
+											return '';
+										}
+									}
+								},
+								emphasis: {
+									focus: 'series'
+								},
+								data: arr
+							});
+						};							
+					};					
+					
+					option && myChart.setOption(option);
+				}				
+				
+				// Create chart for tree summary
+				for (let i = 0;i< res.tree_summary['children'].length;i++){
+					var html = `
+					<div class="col-6">
+						<div class="card" style="height:400px;">
+							<div class="card-header text-center">` + res.tree_summary['children'][i]['name'] + ` - Tree Summary</div>
+							<div class="card-body" id="tree_summary` + i + `"></div>
+						</div>
+						<p></p>
+					</div>
+					`
+					$('#chartscontainer').append(html)
+					var chartDom = document.getElementById('tree_summary' + i);
+					var myChart = echarts.init(chartDom);
+					option_tree['series'][0]['data'] = [res.tree_summary['children'][i]];
+					// option_tree['series'][0]['data'] = [res.tree_summary];
+					console.log(option_tree['series'][0]['data']);
+					option_tree && myChart.setOption(option_tree);
+
+				}				
+				
+			}			
+		})
+	}	
+	$(function(){
+		CreateCharts();	
+	})
+		
+	
+	
+</script>
+{% endblock %}
+
+<!-- Main body block -->
+{% block mainbody %}
+
+	<div class="card">
+		<div class="card-header">
+			<div class="row">
+				<nav style="--bs-breadcrumb-divider: '-';" aria-label="breadcrumb">
+					<ol class="breadcrumb">						
+						<li class="breadcrumb-item active">Home</li>
+					</ol>
+				</nav>
+			</div>			
+		</div>
+		<div class="card-body">
+			<div class="row" id="chartscontainer">
+				<div class="row text-center"><h5>Asset summary</h5></div>				
+				<p></p>				
+			</div>
+		</div>
+		<div class="card-footer text-muted">
+		</div>
+	</div>
+
+
+
+{% endblock %}

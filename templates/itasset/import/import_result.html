@@ -1,0 +1,67 @@
+{% extends "itasset/layout.html" %}
+
+{% block title %}
+<title>Upload result</title>
+{% endblock %} 
+
+<!-- script block -->
+{% block scripts %}
+<script>
+	
+	$(function(){
+		$('#maintable').DataTable( {
+			dom: '<"row"<"col-3"B><"col-6 text-center"i><"col-3"f>>rt<"row"<"col-6"l><"col-6"p>>',
+    		paging: false,
+			// scrollY: 400,			
+			'buttons': [
+						{  
+                        extend: 'excelHtml5',  
+                        text: 'Export',
+						className:'btn btn-light',                                                  
+                       	}  
+			]
+		} );
+	} );
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+{% block mainbody %}
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<nav style="--bs-breadcrumb-divider: '-';" aria-label="breadcrumb">
+				<ol class="breadcrumb">						
+					<li class="breadcrumb-item active">{{title}}</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">
+				<thead class="table-light">
+					<tr>
+						{% for i in tableh %}
+						<th>{{ i }}</th>
+						{% endfor %}				
+					</tr>
+				</thead>
+				<tbody>
+				{% for item in result_list %}
+					<tr>
+						{% for i in item %}			
+						<td>{{ i }}</td>
+						{% endfor %}
+					</tr>					
+				{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+
+</div>
+{% endblock %}

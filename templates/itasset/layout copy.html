@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}
+    <title>IT Assets</title>
+    {% endblock %}   
+    {% load static %}   
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'DataTables/datatables.min.css' %}?"{% now "U" %}>
+    <!-- <link rel="stylesheet" href="{% static 'DataTables\Select-1.5.0\css\select.bootstrap5.min.css' %}"> -->
+    
+</head>
+<body>
+  <nav class="navbar bg-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/"><img src="/static/Logo.png"></a>
+      <div class="col-md-3">      
+        <form class="d-flex" role="search" action="/itasset/search" method="get">
+          <input class="form-control me-2" type="search" placeholder="asset/user" aria-label="Search" name="keywords" value="{{ keywords }}" required>
+        </form>
+      </div> 
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class="list-group-item">
+              <a class="nav-link" aria-current="page" href="/itasset">Home</a>
+            </li>                                                                         
+            <li class="list-group-item">
+              <a class="nav-link" href="/itasset/asset/list">Assets</a>
+            </li>                  
+            <li class="list-group-item">
+              <a class="nav-link" href="/itasset/user/list">Users</a>
+            </li> 
+            {% if 'Editor' in group_list%}                              
+            <li class="list-group-item" class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Bulk Action
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/itasset/import/asset">Import Assets</a></li>                                                     
+                <li><a class="dropdown-item" href="/itasset/import/user">Import Users</a></li>                                                     
+                <li><a class="dropdown-item" href="/itasset/import/approve">Bulk Approve</a></li>                                                     
+                <li><a class="dropdown-item" href="/itasset/import/assign">Bulk Assign</a></li>                  
+                <li><a class="dropdown-item" href="/itasset/import/scrap">Bulk Scrap</a></li>                  
+                <li><a class="dropdown-item" href="/itasset/import/scrapapprove">Bulk Scrap Approve</a></li>                  
+              </ul>
+            </li>
+            {% endif %}
+            <li class="list-group-item" class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Reports
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/itasset/report/custom_report?status=3">Custom report</a></li>                   
+                <li><a class="dropdown-item" href="/itasset/report/tanium">Tanium report</a></li>                               
+              </ul>
+            </li>            
+            <li class="list-group-item">
+              <span class="nav-link"> User: {{ request.user }}</span>
+            </li>                
+          </ul>          
+          
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="row" style="height: 80px;"></div>
+          
+  <div class="container">
+        {% block mainbody %}
+        {% endblock %}       
+  </div>
+  <script src="{% static 'jQuery/jquery-3.6.1.min.js' %}"></script>
+  <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'DataTables/datatables.min.js' %}?"{% now "U" %}></script>
+  <!-- <script src="{% static 'DataTables\Select-1.5.0\js\select.bootstrap5.min.js' %}"></script> -->
+</body>
+{% block scripts %}
+{% endblock %}
+</html>

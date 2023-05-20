@@ -1,0 +1,70 @@
+{% extends "document\layout.html" %}
+
+{% block title %}
+<title>Folder Summary</title>
+{% endblock %} 
+
+<!-- script block -->
+{% block scripts %}
+<script>
+	
+	$(function(){
+		$('#maintable').DataTable( {
+			dom: '<"row"<"col-3"B><"col"i><"col-3"f>>rt<"row"<"col-6"l><"col-6"p>>',
+    		// paging: false,
+			// scrollY: 400,
+			stateSave: true,
+			order: [[2,'desc']],			
+			'buttons': [
+						{  
+                        extend: 'excelHtml5',  
+                        text: 'Export excel',
+						className:'btn btn-light',                                                  
+                       	}  
+			]
+		} );
+	} );
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+{% block mainbody %}
+
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/document">Home</a></li>
+					<li class="breadcrumb-item active">Folder summary</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">
+				<thead class="table-light">
+					<tr>
+						{% for i in tableHead %}
+						<th>{{ i }}</th>
+						{% endfor %}				
+					</tr>
+				</thead>
+				<tbody>
+				{% for i in tableBody %}
+					<tr>
+						<td>
+							<a href="/document/customsearch?folder={{i.0}}&year={{i.1}}" target="_blank">{{i.0}}</a>
+						</td>
+						<td>{{i.1}}</td>
+						<td>{{i.2}}</td>
+					</tr>					
+				{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+{% endblock %}

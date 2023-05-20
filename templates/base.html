@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}
+    <title>IT DB</title>
+    {% endblock %}   
+    {% load static %}   
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'DataTables/datatables.min.css' %}">
+    
+</head>
+<body>
+  <nav class="navbar bg-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/"><img src="/static/Logo.png"></a>
+      <div class="col-md-6"><h4>IT Operation Management System</h4></div> 
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">                                       
+            <li class="list-group-item" class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                IT Asset
+              </a>
+              <ul class="dropdown-menu">                
+                <li><a class="dropdown-item" href="/itasset">Home</a></li>                                                     
+                <li><a class="dropdown-item" href="/itasset/asset/asset_list">Assets</a></li>                                                     
+                <li><a class="dropdown-item" href="/itasset/user/user_list">Users</a></li>                                                                      
+              </ul>
+            </li>
+            <li class="list-group-item" class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                IT Documents
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/document">Home</a></li>                  
+              </ul>
+            </li>
+            <li class="list-group-item" class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                IT DC
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/itdc">Home</a></li>                  
+              </ul>
+            </li> 
+            <li class="list-group-item">
+              <span class="nav-link"> User: {{ request.user }}</span>
+            </li>           
+          </ul>          
+          
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="row" style="height: 80px;"></div>
+          
+  </div class="container-fluid">
+        {% block mainbody %}
+        {% endblock %}       
+  </div>
+  <script src="{% static 'jQuery/jquery-3.6.1.min.js' %}"></script>
+  <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'DataTables/datatables.min.js' %}"></script>
+</body>
+{% block scripts %}
+{% endblock %}
+</html>

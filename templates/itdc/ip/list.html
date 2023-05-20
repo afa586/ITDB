@@ -1,0 +1,143 @@
+{% extends "itdc/layout.html" %}
+{% block title %}
+    <title>IP list</title>
+{% endblock %}
+<!-- script block -->
+{% block scripts %}
+<script>
+	// Function to add IPs
+	function Add(){
+		$.ajax({
+			url: '/itdc/ip/add',
+			type: 'post',
+			data: $('#addform').serialize(),
+			dataType: 'JSON',
+			success: function(res){
+				if(res.status){
+					window.location.reload();
+				}else{
+					alert(res.msg);
+				}		
+								
+			}
+		})
+	}
+	
+	// Function for record click
+	function trclick(a){
+		document.location = a.getAttribute('uid');
+		// window.open(a.getAttribute('uid'));
+	}
+
+	$(function(){
+		$('#maintable').DataTable( {
+			dom: '<"row"<"col-4"B><"col-4"i><"col-4"f>>rt<"row"<"col-6"l><"col-6"p>>',
+    		paging: false,
+			// scrollY: 400,	
+			stateSave: true,	
+			select: {
+				style: 'single'
+			},		
+			'buttons': [
+						{  
+                        extend: 'excelHtml5',  
+                        text: 'Export',
+						className:'btn btn-light',                                                  
+                       	}  
+			]
+		} );
+		// $('tr[data-href]').on("dblclick", function() {
+		// 	document.location = $(this).data('href');
+		// 	// window.open($(this).data('href'));
+		// });	
+	} );
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+
+
+{% block mainbody %}
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<div class="col">
+				<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="/itdc">Home</a></li>
+						<li class="breadcrumb-item active">IP List</li>
+					</ol>
+				</nav>
+			</div>
+			<div class="col-1">
+				<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal">
+					Add
+				</button>
+			</div>
+		</div>		
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">
+				<thead class="table-light">
+					<tr>
+						<th>Address</th>
+						<th>location</th>
+						<th>Asset</th>
+						<th>Comment</th>		
+					</tr>
+				</thead>
+				<tbody>
+				{% for obj in ip_list %}
+					<tr uid="detail?pk={{obj.id}}" ondblclick="trclick(this)">
+						<td>{{obj.address}}</td>
+						<td>{{obj.location}}</td>						
+						<td>
+							{% if obj.asset %}
+							<a href="/itdc/asset/detail?pk={{obj.asset.pk}}" target="_blank">{{obj.asset}}</a>
+							{% else %}
+							-
+							{% endif %}
+						</td>
+						<td>{{obj.comment}}</td>						
+					</tr>					
+				{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- Modal to add ips -->
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+	<div class="modal-content">
+		<div class="modal-header">
+		<h5 class="modal-title" id="exampleModalLabel">Add IP(s)</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+			<form  method="post" id="addform">
+				{% csrf_token %}  
+
+					<div class="row">			
+						{% for field in form %}
+							<div class="col-6">
+								<label for="id_{{ field.name }}" >{{ field.label }}</label>
+								{{ field }} <span style="color:red">{{ field.errors.0 }}</span>
+							</div>
+						{% endfor %}
+					</div>		
+			
+			  </form>
+		</div>
+		<div class="modal-footer">
+		<button type="button" class="btn btn-secondary" onclick="Add()">Save</button>
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		</div>
+	</div>
+	</div>
+</div>
+{% endblock %}

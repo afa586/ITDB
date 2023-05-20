@@ -1,0 +1,71 @@
+{% extends "document\layout.html" %}
+
+{% block title %}
+<title>Duplicate documents</title>
+{% endblock %} 
+
+<!-- script block -->
+{% block scripts %}
+<script>
+	
+	$(function(){
+		$('#maintable').DataTable( {
+			dom: '<"row"<"col-4"B><"col"i><"col-4"f>>rt<"row"<"col-6"l><"col-6"p>>',
+    		// paging: false,
+			// scrollY: 400,
+			stateSave: true,
+			order: [[1,'desc']],			
+			'buttons': [
+						{  
+                        extend: 'excelHtml5',  
+                        text: 'Export excel',
+						className:'btn btn-light',                                                  
+                       	}  
+			]
+		} );
+	} );
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+{% block mainbody %}
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/document">Home</a></li>
+					<li class="breadcrumb-item active">Duplicate documents</li>
+				</ol>
+			</nav>
+		</div>		
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-sm" id="maintable">
+				<thead class="table-light">
+					<tr>
+						{% for i in tableHead %}
+						<th>{{ i }}</th>
+						{% endfor %}				
+					</tr>
+				</thead>
+				<tbody>
+				{% for i in tableBody %}
+					<tr>
+						<td>
+							<a href="/document/customsearch?name={{i.0}}" target="_blank">{{i.0}}</a>
+						</td>
+						<td>{{i.1}}</td>
+					</tr>					
+				{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+
+</div>
+{% endblock %}

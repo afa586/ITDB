@@ -1,0 +1,224 @@
+{% extends "logviewer/layout.html" %}
+
+{% block title %}
+<title>Windows Event Logs</title>
+{% endblock %} 
+
+<!-- script block -->
+{% block scripts %}
+<script>
+	function binSelectFilter(){
+		$('.filters').change(function(){
+			$('#filterform').submit();
+		})
+	}
+
+	// Function to show detail
+	function showDetails(data) {
+		$("#detail1").html(data[1]);
+		$("#detail2").html(data[2]);
+		$("#detail3").html(data[3]);
+		$("#detail4").html(data[4]);
+		$("#detail5").html(data[5]);
+		$("#detail6").html(data[6]);
+		$("#detail7").html(data[7]);
+		$("#detail8").html(data[8]);
+		$("#detail9").html(data[9]);
+		$("#detail10").html(data[10]);
+		$("#detail11").html(data[11]);
+		$("#detail12").html(data[12]);
+		$("#detail13").html(data[13]);
+		$('#myModal').modal('show');
+	}
+	
+	$(function(){
+		binSelectFilter();		
+		var table = $('#maintable').DataTable( {
+			paging: false,
+		} );
+		
+		// Function to fill actions
+		$('#fill-btn').click(function() {
+			// Get all cells in the second column (index 1)
+			var cells = $("#maintable td:nth-child(8)");    
+			// Set their value to "some value"
+			cells.text("No Action");
+
+		});
+
+		// Function to update data to database
+		$('#update-btn').click(function() {
+			var data = [];
+			$('#maintable tbody tr').each(function() {
+			var row = [];
+			$(this).find('td').each(function() {
+				row.push($(this).text());
+			});
+			// data.push(row.join(','));
+			data.push(row);
+			});
+			
+			$.ajax({
+			url: '/logviewer/netlog/list',
+			method: 'POST',
+			data: {
+				csrfmiddlewaretoken: '{{ csrf_token }}',
+				'data': JSON.stringify(data),
+			},
+			success: function(response) {
+				if (response.success) {
+				alert('Updated successfully');
+				location.reload();
+				} else {
+				alert('Failed to update: ' + response.error);
+				}
+			},
+			error: function() {
+				alert('Failed to update');
+			}
+			});
+		});
+
+		// Doucble click row to show detail
+		$('#maintable tbody').on('dblclick', 'tr', function () {
+		var data = table.row(this).data();
+		showDetails(data); // call the function to show the details for this row
+});
+		
+	});
+	
+</script>
+{% endblock %}
+
+<!-- main body block -->
+{% block mainbody %}
+
+
+<!-- Windows Event Logs table-->
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<div class="col">
+				<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item active">Windows Error Log List</li>
+					</ol>
+				</nav>
+			</div>	
+			<!-- <div class="col-1"><a href="add" class="btn btn-primary btn-sm">Add</a></div>	 -->
+		</div>
+		<!-- Filter Area -->				
+		<div class="row">
+			<div class="col-8">				
+				<form method="get" id="filterform">	
+					<div class="row">						
+						{% for field in form %}
+						<div class="col-1">
+							<label for="id_{{ field.name }}" >{{ field.label }}:</label>
+						</div>
+						<div class="col">
+							{{ field }} 
+						</div>					
+						{% endfor %}
+					</div>
+				</form>	
+			</div>	
+			<div class="col">
+				<button id="fill-btn" class="btn btn-sm btn-primary">Auto Fill</button>
+				<button id="update-btn" class="btn btn-sm btn-primary">Update</button>
+			</div>
+		</div>
+		
+	</div>
+	<div class="card-body">
+		<div class="table-responsive">
+			<!-- <table class="display table-hover " id="maintable" style="width:100%">	 -->
+			<table class="table table-hover table-sm" id="maintable">	
+				<thead class="table-light">
+					<tr>
+						<th>ID</th>
+						<th>Date</th>
+						<th>Server</th>
+						<th>Event_ID</th>
+						<th>Count</th>	
+						<th>Check_Date</th>
+						<th>Check_By</th>
+						<th>Action</th>		
+						<th>Description</th>		
+						<th>Solution_ID</th>
+						<th>Solution_Action</th>		
+						<th>Source</th>				
+						<th hidden>Error_Description</th>
+						<th hidden>Cause</th>
+															
+					</tr>
+				</thead>	
+			
+				<tbody id="tablebody">	
+					{% for i in log_list %}
+					<tr
+					{% if 'no action' not in i.solution.action|lower %}
+						style="background-color:red;max-height: 100px;"
+					{% else %}	
+						style="max-height: 100px;"
+					{% endif %}
+					>
+						<td>{{ i.id }}</td>	
+						<td class="text-truncate">{{ i.date|date:"Y-m-d" }}</td>
+						<td class="text-truncate">{{ i.server }}</td>
+						<td class="text-truncate">{{ i.event_id }}</td>
+						<td class="text-truncate">{{ i.count }}</td>
+						<td class="text-truncate">{{ i.check_date|date:"Y-m-d" }}</td>
+						<td class="text-truncate">{{ i.check_by }}</td>
+						<td contentEditable="true">{{ i.action }}</td>
+						<td contentEditable="true">{{ i.description }}</td>
+						<td class="text-truncate">{{ i.solution.solution_id }}</td>
+						<td class="text-truncate">{{ i.solution.action }}</td>	
+						<td class="text-truncate">{{ i.solution.source }}</td>				
+						<td hidden>{{ i.solution.error_desc}}</td>
+						<td hidden>{{ i.solution.cause  }}</td>
+									
+					</tr>
+									
+				{% endfor %}
+
+				</tbody>	
+			</table>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal to show details -->
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-xl" role="document">
+	<div class="modal-content">
+	<div class="modal-header">
+		<h5 class="modal-title" id="myModalLabel">Error Event Details</h5>
+	</div>
+	<div class="modal-body container">
+		<div class="row">
+			<div class="row"><div class="col-2">Date:</div><div class="col" id="detail1"></div></div>
+			<div class="row"><div class="col-2">Event ID:</div><div class="col" id="detail2"></div></div>
+			<div class="row"><div class="col-2">Server:</div><div class="col" id="detail3"></div></div>
+			<div class="row"><div class="col-2">Count:</div><div class="col" id="detail4"></div></div>
+			<div class="row"><div class="col-2">Check Date:</div><div class="col" id="detail5"></div></div>
+			<div class="row"><div class="col-2">Check By:</div><div class="col" id="detail6"></div></div>
+			<div class="row"><div class="col-2">Action:</div><div class="col" id="detail7"></div></div>
+			<div class="row"><div class="col-2">Description:</div><div class="col" id="detail8"></div></div>
+			<div class="row"><div class="col-2">Solution ID:</div><div class="col" id="detail9"></div></div>
+			<div class="row"><div class="col-2">Solution Action:</div><div class="col" id="detail10"></div></div>
+			<div class="row"><div class="col-2">Source</Source>:</div><div class="col" id="detail11"></div></div>
+			<div class="row"><div class="col-2">Error Description:</div><div class="col" id="detail12"></div></div>
+			<div class="row"><div class="col-2">Cause:</div><div class="col" id="detail13"></div></div>
+
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	</div>
+	</div>
+</div>
+</div>
+{% endblock %}
