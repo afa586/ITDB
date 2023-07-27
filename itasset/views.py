@@ -247,7 +247,7 @@ class AssetView(LoginRequiredMixin,View):
                 return redirect('/itasset/asset/detail' + '?pk=%s'%(asset.id)) 
             # Change company choices
             form.fields['company'].choices = list(Company.objects.filter(name__in=group_list).values_list('name','name'))              
-            return render(request,'itasset/asset/form',{'form':form,'title':title})
+            return render(request,'itasset/asset/form.html',{'form':form,'title':title})
         
         # Run approve logic
         if action== 'approve':
